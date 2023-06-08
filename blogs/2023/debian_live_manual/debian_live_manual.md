@@ -1,0 +1,215 @@
+
+# Debian Live Manual
+
+## About
+--------
+### About this manual
+
+- [1.About this manual](1.About_this_manual.md#1-about-this-manual)
+    - [1.1 For the impatient](1.About_this_manual.md#11-for-the-impatient)
+    - [1.2 Terms](1.About_this_manual.md#12-terms)
+    - [1.3 Authors](1.About_this_manual.md#13-authors)
+    - [1.4 Contributing to this document](1.About_this_manual.md#14-contributing-to-this-document)
+        - [1.4.1 Applying changes](1.About_this_manual.md#141-applying-changes)
+        - [1.4.2 Translation](1.About_this_manual.md#142-translation)
+
+### About the Debian Live Project
+
+- [2.About the Debian Live Project](2.About_the_Debian_Live_Project.md#2-about-the-debian-live-project)
+    - [2.1 Motivation](2.About_the_Debian_Live_Project.md#21-motivation)
+        - [2.1.1 What is wrong with current live systems](2.About_the_Debian_Live_Project.md#211-what-is-wrong-with-current-live-systems)
+        - [2.1.2 Why create our own live system?](2.About_the_Debian_Live_Project.md#212-why-create-our-own-live-system)
+    - [2.2 Philosophy](2.About_the_Debian_Live_Project.md#22-philosophy)
+        - [2.2.1 Only unchanged packages from Debian "main"](2.About_the_Debian_Live_Project.md#221-only-unchanged-packages-from-debian-main)
+        - [2.2.2 No package configuration of the live system](2.About_the_Debian_Live_Project.md#222-no-package-configuration-of-the-live-system)
+    - [2.3 Contact](2.About_the_Debian_Live_Project.md#23-contact)
+
+## User
+--------
+### Installation
+
+- [3.Installation](3.Installation.md#3-installation)
+    - [3.1 Requirements](3.Installation.md#31-requirements)
+    - [3.2 Installing live-build](3.Installation.md#32-installing-live-build)
+        - [3.2.1 From the Debian repository](3.Installation.md#321-from-the-debian-repository)
+        - [3.2.2 From source](3.Installation.md#322-from-source)
+    - [3.3 Installing live-boot and live-config](3.Installation.md#33-installing-live-boot-and-live-config)
+        - [3.3.1 From the Debian repository](3.Installation.md#331-from-the-debian-repository)
+        - [3.3.2 From source](3.Installation.md#332-from-source)
+
+### The basics
+
+- [4.The basics](4.The_basics.md#4-the-basics)
+    - [4.1 What is a live system?](4.The_basics.md#41-what-is-a-live-system)
+    - [4.2 First steps: building an ISO hybrid image](4.The_basics.md#42-first-steps-building-an-iso-hybrid-image)
+    - [4.3 Using an ISO hybrid live image](4.The_basics.md#43-using-an-iso-hybrid-live-image)
+        - [4.3.1 Burning an ISO image to a physical medium](4.The_basics.md#431-burning-an-iso-image-to-a-physical-medium)
+        - [4.3.2 Copying an ISO hybrid image to a USB stick](4.The_basics.md#432-copying-an-iso-hybrid-image-to-a-usb-stick)
+        - [4.3.3 Using the space left on a USB stick](4.The_basics.md#433-using-the-space-left-on-a-usb-stick)
+        - [4.3.4 Booting the live medium](4.The_basics.md#434-booting-the-live-medium)
+    - [4.4 Using a virtual machine for testing](4.The_basics.md#44-using-a-virtual-machine-for-testing)
+        - [4.4.1 Testing an ISO image with QEMU](4.The_basics.md#441-testing-an-iso-image-with-qemu)
+        - [4.4.2 Testing an ISO image with VirtualBox](4.The_basics.md#442-testing-an-iso-image-with-virtualbox)
+    - [4.5 Building and using an HDD image](4.The_basics.md#45-building-and-using-an-hdd-image)
+    - [4.6 Building a netboot image](4.The_basics.md#46-building-a-netboot-image)
+        - [4.6.1 DHCP server](4.The_basics.md#461-dhcp-server)
+        - [4.6.2 TFTP server](4.The_basics.md#462-tftp-server)
+        - [4.6.3 NFS server](4.The_basics.md#463-nfs-server)
+        - [4.6.4 Netboot testing HowTo](4.The_basics.md#464-netboot-testing-howto)
+        - [4.6.5 Qemu](4.The_basics.md#465-qemu)
+    - [4.7 Webbooting](4.The_basics.md#47-webbooting)
+        - [4.7.1 Getting the webboot files](4.The_basics.md#47-webbooting)
+        - [4.7.2 Booting webboot images](4.The_basics.md#472-booting-webboot-images)
+
+### Overview of tools
+
+- [5.Overview of tools](5.Overview_of_tools.md#5-overview-of-tools)
+    - [5.1 The live-build package](5.Overview_of_tools.md#51-the-live-build-package)
+        - [5.1.1 The lb config command](5.Overview_of_tools.md#511-the-lb-config-command)
+        - [5.1.2 The lb build command](5.Overview_of_tools.md#512-the-lb-build-command)
+        - [5.1.3 The lb clean command](5.Overview_of_tools.md#513-the-lb-clean-command)
+    - [5.2 The live-boot package](5.Overview_of_tools.md#52-the-live-boot-package)
+    - [5.3 The live-config package](5.Overview_of_tools.md#53-the-live-config-package)
+
+### Managing a configuration
+
+- [6.Managing a configuration](6.Managing_a_configuration.md#6-managing-a-configuration)
+    - [6.1 Dealing with configuration changes](6.Managing_a_configuration.md#61-dealing-with-configuration-changes)
+        - [6.1.1 Why use auto scripts? What do they do?](6.Managing_a_configuration.md#611-why-use-auto-scripts-what-do-they-do)
+        - [6.1.2 Use example auto scripts](6.Managing_a_configuration.md#612-use-example-auto-scripts)
+    - [6.2 Clone a configuration published via Git](6.Managing_a_configuration.md#62-clone-a-configuration-published-via-git)
+
+### Customizing contents
+
+- [7.Customization overview](7.Customization_overview.md#7-customization-overview)
+    - [7.1 Build time vs. boot time configuration](7.Customization_overview.md#71-build-time-vs-boot-time-configuration)
+    - [7.2 Stages of the build](7.Customization_overview.md#72-stages-of-the-build)
+    - [7.3 Supplement lb config with files](7.Customization_overview.md#73-supplement-lb-config-with-files)
+    - [7.4 Customization tasks](7.Customization_overview.md#74-customization-tasks)
+
+### Customizing package installation
+
+- [8.Customizing package installation](8.Customizing_package_installation.md#8-customizing-package-installation)
+    - [8.1 Package sources]()
+        - [8.1.1 Distribution, archive areas and mode]()
+        - [8.1.2 Distribution mirrors]()
+        - [8.1.3 Distribution mirrors used at build time]()
+        - [8.1.4 Distribution mirrors used at run time]()
+        - [8.1.5 Additional repositories]()
+    - [8.2 Choosing packages to install]()
+        - [8.2.1 Package lists]()
+        - [8.2.2 Using metapackages]()
+        - [8.2.3 Local package lists]()
+        - [8.2.4 Local binary package lists]()
+        - [8.2.5 Generated package lists]()
+        - [8.2.6 Using conditionals inside package lists]()
+        - [8.2.7 Removing packages at install time]()
+        - [8.2.8 Desktop and language tasks]()
+        - [8.2.9 Kernel flavour and version]()
+        - [8.2.10 Custom kernels]()
+    - [8.3 Installing modified or third-party packages]()
+        - [8.3.1 Using packages.chroot to install custom packages]()
+        - [8.3.2 Using an APT repository to install custom packages]()
+        - [8.3.3 Custom packages and APT]()
+    - [8.4 Configuring APT at build time]()
+        - [8.4.1 Choosing apt or aptitude]()
+        - [8.4.2 Using a proxy with APT]()
+        - [8.4.3 Tweaking APT to save space]()
+        - [8.4.4 Passing options to apt or aptitude]()
+        - [8.4.5 APT pinning]()
+
+### Customizing contents
+
+- [9.Customizing contents](9.Customizing_contents.md#9-customizing-contents)
+    - [9.1 Includes]()
+        - [9.1.1 Live/chroot local includes]()
+        - [9.1.2 Binary local includes]()
+    - [9.2 Hooks]()
+        - [9.2.1 Chroot local hooks]()
+        - [9.2.2 Binary local hooks]()
+        - [9.2.3 Boot-time hooks]()
+    - [9.3 Preseeding Debconf questions]()
+
+### Customizing run time behaviours
+
+- [10.Customizing run time behaviours](10.Customizing_run_time_behaviours.md#10-customizing-run-time-behaviours)
+    - [10.1 Customizing the live user]()
+    - [10.2 Customizing locale and language]()
+    - [10.3 Persistence]()
+        - [10.3.1 The persistence.conf file]()
+        - [10.3.2 Using more than one persistence store]()
+        - [10.3.3 Using persistence with encryption]()
+
+### Customizing the binary image
+
+- [11.Customizing the binary image](11.Customizing_the_binary_image.md#11-customizing-the-binary-image)
+    - [11.1 Bootloaders]()
+    - [11.2 ISO metadata]()
+
+### Customizing Debian Installer
+
+- [12.Customizing Debian Installer](12.Customizing_Debian_Installer.md#12-customizing-debian-installer)
+    - [12.1 Types of Debian Installer]()
+    - [12.2 Customizing Debian Installer by preseeding]()
+    - [12.3 Customizing Debian Installer content]()
+
+## Project
+--------
+### Contributing to the project
+
+- [13.Contributing to the project](13.Contributing_to_the_project.md#13-contributing-to-the-project)
+    - [13.1 Translation of man pages]()
+
+### Reporting bugs
+
+- [14.Reporting bugs](14.Reporting_bugs.md#14-reporting-bugs)
+    - [14.1 Known issues]()
+    - [14.2 Do the research]()
+    - [14.3 Rebuild from scratch]()
+    - [14.4 Use up-to-date packages]()
+    - [14.5 Collect information]()
+    - [14.6 Isolate the failing case if possible]()
+    - [14.7 Use the correct package to report the bug against]()
+        - [14.7.1 At build time while bootstrapping]()
+        - [14.7.2 At build time while installing packages]()
+        - [14.7.3 At boot time]()
+        - [14.7.4 At run time]()
+    - [14.8 Where to report bugs]()
+
+### Coding Style
+
+- [15.Coding Style](15.Coding_Style.md#15-coding-style)
+    - [15.1 Compatibility]()
+    - [15.2 Indenting]()
+    - [15.3 Wrapping]()
+    - [15.4 Variables]()
+    - [15.5 Miscellaneous]()
+
+## Examples
+--------
+### Examples
+
+- [16.Examples](16.Examples.md#16-examples)
+    - [16.1 Using the examples]()
+    - [16.2 Tutorial 1: A default image]()
+    - [16.3 Tutorial 2: A web browser utility]()
+    - [16.4 Tutorial 3: A personalized image]()
+        - [16.4.1 First revision]()
+        - [16.4.2 Second revision]()
+    - [16.5 A VNC Kiosk Client]()
+    - [16.6 A minimal image for a 256MB USB key]()
+    - [16.7 A localized GNOME desktop and installer]()
+
+## Appendix
+--------
+### Style guide
+
+- [17.Style guide](17.Style_guide.md#17-style-guide)
+    - [17.1 Guidelines for authors](17.Style_guide.md#171-guidelines-for-authors)
+        - [17.1.1 Linguistic features](17.Style_guide.md#1711-linguistic-features)
+        - [17.1.2 Procedures](17.Style_guide.md#1712-procedures)
+    - [17.2 Guidelines for translators](17.Style_guide.md#172-guidelines-for-translators)
+        - [17.2.1 Translation hints](17.Style_guide.md#1721-translation-hints)
+
+
+@Update for 2023.
