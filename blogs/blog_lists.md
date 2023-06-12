@@ -1,6 +1,12 @@
 
 # Blogs Lists
 
+**2022**
+
+- [C program manual](2022/c_manual.md)
+
+**2023**
+
 - [Debian live build](2023/debian_live_build.md)
 - [Kali Linux live build](2023/kali_live_build.md)
 - [Debian Live Manual](2023/debian_live_manual/debian_live_manual.md)
