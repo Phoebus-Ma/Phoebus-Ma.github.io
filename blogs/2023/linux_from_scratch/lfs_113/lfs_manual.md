@@ -268,4 +268,6 @@
 
 **[Index](index.md)**
 
+[User guide for virtualbox](User_guide_for_vbox.md)
+
 **Copyright © 1999-2023 Gerard Beekmans**
