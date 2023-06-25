@@ -152,6 +152,48 @@ Last sector, +/-sectors or +/-size{K,M,G,T,P} (4720640-73400319, default 7340031
 
 Created a new partition 3 of type 'Linux' and of size 32.7 GiB.
 
+Command (m for help): t
+Partition number (1-3, default 3): 2
+Hex code or alias (type L to list all): L
+
+00 Empty            24 NEC DOS          81 Minix / old Lin  bf Solaris
+01 FAT12            27 Hidden NTFS Win  82 Linux swap / So  c1 DRDOS/sec (FAT-
+02 XENIX root       39 Plan 9           83 Linux            c4 DRDOS/sec (FAT-
+03 XENIX usr        3c PartitionMagic   84 OS/2 hidden or   c6 DRDOS/sec (FAT-
+04 FAT16 <32M       40 Venix 80286      85 Linux extended   c7 Syrinx
+05 Extended         41 PPC PReP Boot    86 NTFS volume set  da Non-FS data
+06 FAT16            42 SFS              87 NTFS volume set  db CP/M / CTOS / .
+07 HPFS/NTFS/exFAT  4d QNX4.x           88 Linux plaintext  de Dell Utility
+08 AIX              4e QNX4.x 2nd part  8e Linux LVM        df BootIt
+09 AIX bootable     4f QNX4.x 3rd part  93 Amoeba           e1 DOS access
+0a OS/2 Boot Manag  50 OnTrack DM       94 Amoeba BBT       e3 DOS R/O
+0b W95 FAT32        51 OnTrack DM6 Aux  9f BSD/OS           e4 SpeedStor
+0c W95 FAT32 (LBA)  52 CP/M             a0 IBM Thinkpad hi  ea Linux extended
+0e W95 FAT16 (LBA)  53 OnTrack DM6 Aux  a5 FreeBSD          eb BeOS fs
+0f W95 Ext'd (LBA)  54 OnTrackDM6       a6 OpenBSD          ee GPT
+10 OPUS             55 EZ-Drive         a7 NeXTSTEP         ef EFI (FAT-12/16/
+11 Hidden FAT12     56 Golden Bow       a8 Darwin UFS       f0 Linux/PA-RISC b
+12 Compaq diagnost  5c Priam Edisk      a9 NetBSD           f1 SpeedStor
+14 Hidden FAT16 <3  61 SpeedStor        ab Darwin boot      f4 SpeedStor
+16 Hidden FAT16     63 GNU HURD or Sys  af HFS / HFS+       f2 DOS secondary
+17 Hidden HPFS/NTF  64 Novell Netware   b7 BSDI fs          fb VMware VMFS
+18 AST SmartSleep   65 Novell Netware   b8 BSDI swap        fc VMware VMKCORE
+1b Hidden W95 FAT3  70 DiskSecure Mult  bb Boot Wizard hid  fd Linux raid auto
+1c Hidden W95 FAT3  75 PC/IX            bc Acronis FAT32 L  fe LANstep
+1e Hidden W95 FAT1  80 Old Minix        be Solaris boot     ff BBT
+
+Aliases:
+   linux          - 83
+   swap           - 82
+   extended       - 05
+   uefi           - EF
+   raid           - FD
+   lvm            - 8E
+   linuxex        - 85
+Hex code or alias (type L to list all): 82
+
+Changed type of partition 'Linux' to 'Linux swap / Solaris'.
+
 Command (m for help): w
 The partition table has been altered.
 Calling ioctl() to re-read partition table.
