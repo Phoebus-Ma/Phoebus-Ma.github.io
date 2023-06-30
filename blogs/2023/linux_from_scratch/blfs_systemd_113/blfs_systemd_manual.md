@@ -976,4 +976,4 @@
 
 - [Glossary](Glossary.md)
 
-- [Index](https://www.linuxfromscratch.org/blfs/view/stable/longindex.html)
+- [Index](Index.md)
