@@ -1,7 +1,7 @@
 
 ## Table of Contents
 
-### Preface
+### [Preface](Preface.md)
 --------
 
 - [Foreword](Preface.md#foreword)
