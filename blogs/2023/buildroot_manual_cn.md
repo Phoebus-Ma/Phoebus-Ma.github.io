@@ -54,7 +54,7 @@ Buildroot用户手册
 
 [8.10. 绘制构建持续时间](#810-graphing-the-build-duration)
 
-[8.11. 绘制包对文件系统大小的贡献](#811-graphing-the-filesystem-size-contribution-of-packages)
+[8.11. 绘制包对文件系统存储的占用](#811-graphing-the-filesystem-size-contribution-of-packages)
 
 [8.12. 顶层并行构建](#812-top-level-parallel-build)
 
@@ -178,7 +178,7 @@ Buildroot用户手册
 
 [18.19. 基于QMake的包的基础架构](#1819-infrastructure-for-qmake-based-packages)
 
-[18.20. 构建内核模块的包的基础设施](#1820-infrastructure-for-packages-building-kernel-modules)
+[18.20. 构建内核模块的包的基础架构](#1820-infrastructure-for-packages-building-kernel-modules)
 
 [18.21. asciidoc文档的基础架构](#1821-infrastructure-for-asciidoc-documents)
 
@@ -358,7 +358,7 @@ Buildroot设计用于在Linux系统上运行。
     *   `asciidoc`, 8.6.3或更高版本
     *   `w3m`
     *   `python`带有`argparse`模块 (自动出现在2.7+和3.2+版本中)
-    *   `dblatex` (只需要PDF手册)
+    *   `dblatex` (仅PDF手册需要)
     
 *   图形生成工具:
     
@@ -370,7 +370,7 @@ Buildroot设计用于在Linux系统上运行。
 # Chapter 3. Getting Buildroot
 ----------------------------
 
-Buildroot每3个月发布一次，分别在2月、5月、8月和11月。发行版本号的格式为YYYY。嗯，比如2013.02,2014.08。
+Buildroot每3个月发布一次，分别在2月、5月、8月和11月。发行版本号的格式为YYYY.MM，比如2013.02,2014.08。
 
 发布压缩包可在 [http://buildroot.org/downloads/](http://buildroot.org/downloads/).
 
@@ -439,7 +439,7 @@ $ make gconfig
 $ make
 ```
 
-默认情况下，Buildroot不支持顶级并行构建，因此无需运行`make -jN`。不过，也有对顶级并行构建的实验性支持，参见[8.12节，“顶层并行构建”](#812-top-level-parallel-build)。
+默认情况下，Buildroot不支持顶层并行构建，因此无需运行`make -jN`。不过，也有对顶层并行构建的实验性支持，参见[8.12节，“顶层并行构建”](#812-top-level-parallel-build)。
 
 `make`命令通常会执行以下步骤:
 
@@ -456,7 +456,7 @@ Buildroot的输出存储在单个目录`output/`中。这个目录包含以下�
 *   `build/`是构建所有组件的地方(包括Buildroot在主机上所需的工具和为目标编译的包)。这个目录包含每个组件的一个子目录。
 *   `host/`包含为主机构建的工具和目标工具链的sysroot。前者是为主机编译的工具的安装，这些工具是正确执行Buildroot所必需的，包括交叉编译工具链。后者类似于根文件系统的层次结构。它包含所有用户空间包的头和库，这些包提供和安装其他包使用的库。但该目录并不是目标文件系统的根文件系统:它包含了很多开发文件、未删除的二进制文件和库，对于嵌入式系统来说，这个目录太大了。这些开发文件用于为目标编译依赖于其他库的库和应用程序。
 *   `staging/`是指向`host/`中的目标工具链sysroot的符号链接，它的存在是为了向后兼容。
-*   `target/`几乎包含了目标的完整根文件系统:除了`/dev/`中的设备文件之外，所有需要的文件都已经存在了(Buildroot不能创建它们，因为Buildroot不是以root身份运行，也不想以root身份运行)。此外，它没有正确的权限(例如busybox二进制文件的setuid)。因此，这个目录**不应该在你的目标上使用**。相反，你应该使用在`images/`目录下构建的一个图像。如果你需要根文件系统的解压镜像来通过NFS引导，那么使用在`images/`中生成的压缩镜像并将其解压为根文件。与`staging/`相比，`target/`只包含运行所选目标应用程序所需的文件和库:开发文件(头文件等)不存在，二进制文件被剥离。
+*   `target/`几乎包含了目标的完整根文件系统:除了`/dev/`中的设备文件之外，所有需要的文件都已经存在了(Buildroot不能创建它们，因为Buildroot不是以root身份运行，也不想以root身份运行)。此外，它没有正确的权限(例如busybox二进制文件的setuid)。因此，这个目录**不应该在你的目标上使用**。相反，你应该使用在`images/`目录下构建的一个图像。如果你需要根文件系统的解压镜像来通过NFS引导，那么使用在`images/`中生成的压缩镜像并将其解压为根文件。与`staging/`相比，`target/`只包含运行所选目标应用程序所需的文件和库:开发文件(头文件等)不存在，二进制文件被剥离(strip)。
 
 这些命令，`make menuconfig|nconfig|gconfig|xconfig`和`make`，是最基本的命令，允许轻松快速地生成符合您需求的图像，具有您启用的所有功能和应用程序。
 
@@ -634,7 +634,7 @@ make sdk
 
 在`System configuration`, 和`/dev management`目录下，Buildroot提供了四种不同的解决方案来处理`/dev`目录:
 
-*   第一个解决方案是**静态使用设备表**。这是Linux中处理设备文件的古老经典方法。使用这种方法，设备文件持久化存储在根文件系统中(即，它们在重新启动时保持不变)，并且当从系统中添加或删除硬件设备时，没有任何东西会自动创建和删除这些设备文件。因此，Buildroot使用设备表创建一组标准的设备文件，默认设备表存储在Buildroot源代码中的`system/device_table_dev.txt`中。当Buildroot生成最终的根文件系统映像时将处理该文件，因此设备文件在`output/target`目录中是不可见的。`BR2_ROOTFS_STATIC_DEVICE_TABLE`选项允许更改Buildroot使用的默认设备表，或者添加额外的设备表，以便Buildroot在构建期间创建额外的设备文件。因此，如果您使用此方法，并且您的系统中缺少一个设备文件，例如，您可以创建一个包含附加设备文件描述的`board/<yourcompany>/<yourproject>/device_table_dev.txt`文件，然后您可以将`BR2_ROOTFS_STATIC_DEVICE_TABLE`设置为`system/device_table_dev.txt board/<yourcompany>/<yourproject>/device_table_dev.txt`。有关设备表文件格式的更多细节，请参阅[第25章，Makedev语法文档](#chapter-25-makedev-syntax-documentation)。
+*   第一个解决方案是**静态使用设备表**。这是Linux中处理设备文件的古老经典方法。使用这种方法，设备文件持久化存储在根文件系统中(即，它们在重新启动时保持不变)，并且当从系统中添加或删除硬件设备时，没有任何东西会自动创建和删除这些设备文件。因此，Buildroot使用设备表创建一组标准的设备文件，默认设备表存储在Buildroot源代码中的`system/device_table_dev.txt`中。当Buildroot生成最终的根文件系统映像时将清理该文件，因此设备文件在`output/target`目录中是不可见的。`BR2_ROOTFS_STATIC_DEVICE_TABLE`选项允许更改Buildroot使用的默认设备表，或者添加额外的设备表，以便Buildroot在构建期间创建额外的设备文件。因此，如果您使用此方法，并且您的系统中缺少一个设备文件，例如，您可以创建一个包含附加设备文件描述的`board/<yourcompany>/<yourproject>/device_table_dev.txt`文件，然后您可以将`BR2_ROOTFS_STATIC_DEVICE_TABLE`设置为`system/device_table_dev.txt board/<yourcompany>/<yourproject>/device_table_dev.txt`。有关设备表文件格式的更多细节，请参阅[第25章，Makedev语法文档](#chapter-25-makedev-syntax-documentation)。
 *   第二种解决方案是**仅动态使用devtmpfs**。devtmpfs是Linux内核中的一个虚拟文件系统，在内核2.6.32中引入(如果您使用的是旧的内核，则不能使用该选项)。当挂载到`/dev`时，这个虚拟文件系统将自动使设备文件随着硬件设备的添加和从系统中删除而显示和消失。该文件系统在重启期间不是持久的，它是由内核动态填充的。使用devtmpfs需要启用以下内核配置选项:`CONFIG_DEVTMPFS` 和 `CONFIG_DEVTMPFS_MOUNT`。当Buildroot负责为嵌入式设备构建Linux内核时，它会确保启用这两个选项。但是，如果您在Buildroot之外构建Linux内核，那么启用这两个选项是您的责任(如果您没有这样做，您的Buildroot系统将无法启动)。
 *   第三种解决方案是**动态使用devtmpfs + mdev**。此方法也依赖于上面详细介绍的devtmpfs虚拟文件系统(因此在内核配置中启用`CONFIG_DEVTMPFS` 和 `CONFIG_DEVTMPFS_MOUNT`的需求仍然适用)，但在其之上添加了`mdev`用户空间实用程序。`mdev`是BusyBox的一个程序部分，每次添加或删除设备时内核都会调用它。由于有了`/etc/mdev.conf`配置文件，`mdev`可以被配置为，例如，设置设备文件的特定权限或所有权，在设备出现或消失时调用脚本或应用程序等。基本上，它允许用户空间对设备添加和删除事件做出反应。例如，当设备出现在系统上时，`mdev`可以用于自动加载内核模块。如果你的设备需要固件，`mdev`也很重要，因为它将负责将固件内容推送到内核。`mdev`是`udev`的轻量级实现(具有较少的功能)。有关`mdev`及其配置文件语法的更多细节，请参见[http://git.busybox.net/busybox/tree/docs/mdev.txt](http://git.busybox.net/busybox/tree/docs/mdev.txt)。
 *   第四个解决方案是**动态使用devtmpfs + eudev**。该方法也依赖于上面详细介绍的devtmpfs虚拟文件系统，但在其之上添加了`eudev`用户空间守护进程。`eudev`是一个在后台运行的守护进程，当系统添加或删除设备时，内核会调用它。它是一个比`mdev`更重量级的解决方案，但提供了更高的灵活性。`eudev`是`udev`的独立版本，`udev`是最初在大多数桌面Linux发行版中使用的用户空间守护进程，现在是Systemd的一部分。更多详情，请参阅[http://en.wikipedia.org/wiki/Udev](https://en.wikipedia.org/wiki/Udev)。
@@ -852,7 +852,7 @@ Buildroot不支持删除包而不从头开始重建。这是因为Buildroot不�
 
 虽然`<package>-rebuild`意味着`<package>-reinstall`和`<package>-reconfigure`意味着`<package>-rebuild`，但这些目标和`<package>`都只作用于上述包，而不会触发重新创建根文件系统映像。如果需要重新创建根文件系统，另外应该运行`make`或`make all`。
 
-在内部，Buildroot创建所谓的戳戳文件来跟踪每个包的构建步骤已经完成。它们存储在包构建目录`output/build/<package>-<version>/`中，并被命名为`.stamp_<step-name>`。上面详细描述的命令只是操作这些戳戳文件，以强制Buildroot重新启动包构建过程的特定步骤集。
+在内部，Buildroot创建所谓的stamp文件来跟踪每个包的构建步骤已经完成。它们存储在包构建目录`output/build/<package>-<version>/`中，并被命名为`.stamp_<step-name>`。上面详细描述的命令只是操作这些stamp文件，以强制Buildroot重新启动包构建过程的特定步骤集。
 
 关于包专用make目标的更多细节将在[8.13.5节，“特定于包的生成目标”](#8135-package-specific-make-targets)中解释。
 
@@ -888,9 +888,9 @@ $ cd /tmp/build; make O=$PWD -C path/to/buildroot menuconfig
 
 所有输出文件都位于`/tmp/build`目录下。如果`O`路径不存在，Buildroot会创建它。
 
-**注意:** `O`路径可以是绝对路径也可以是相对路径，但如果它作为相对路径传递，重要的是要注意，它是相对于主Buildroot源目录进行解释的，**not**当前工作目录。
+**注意:** `O`路径可以是绝对路径也可以是相对路径，但如果它作为相对路径传递，重要的是要注意，它是相对于主Buildroot源目录进行解释的，**不是**当前工作目录。
 
-当使用out-of-tree构建时，Buildroot的`.config`和临时文件也存储在输出目录中。这意味着，只要使用唯一的输出目录，您就可以使用相同的源代码树并行运行多个构建。
+当使用树外构建时，Buildroot的`.config`和临时文件也存储在输出目录中。这意味着，只要使用唯一的输出目录，您就可以使用相同的源代码树并行运行多个构建。
 
 为了方便使用，Buildroot在输出目录中生成一个Makefile包装器——因此在第一次运行后，你不再需要传递`O=<…>` 和 `-C <…>`，只需运行(在输出目录中):
 
@@ -914,9 +914,9 @@ $ make <target>
 *   `BR2_GRAPH_OUT` 要设置生成图形的文件类型，可以使用`pdf`(默认)或`png`。
 *   `BR2_GRAPH_DEPS_OPTS` 向依赖关系图传递额外的选项;请参阅[第8.9节，“绘制包之间的依赖关系”](#89-graphing-the-dependencies-between-packages)获取可接受的选项
 *   `BR2_GRAPH_DOT_OPTS` 作为选项一字不差地传递给`dot`工具来绘制依赖关系图。
-*   `BR2_GRAPH_SIZE_OPTS`用于将额外的选项传递给大小图;请参阅[8.11节，“绘制包对文件系统大小的贡献”](#811-graphing-the-filesystem-size-contribution-of-packages)获取可接受的选项
+*   `BR2_GRAPH_SIZE_OPTS`用于将额外的选项传递给大小图;请参阅[8.11节，“绘制包对文件系统存储的占用”](#811-graphing-the-filesystem-size-contribution-of-packages)获取可接受的选项
 
-一个使用位于顶级目录和$HOME中的配置文件的示例:
+一个使用位于顶层目录和$HOME中的配置文件的示例:
 
 ```bash
 $ make UCLIBC_CONFIG_FILE=uClibc.config BUSYBOX_CONFIG_FILE=$HOME/bb.config
@@ -1046,7 +1046,7 @@ BR2_GRAPH_OUT=png make graph-build
 ## 8.11. Graphing the filesystem size contribution of packages
 -----------------------------------------------------------
 
-当你的目标系统增长时，有时候了解每个Buildroot包对整个根文件系统大小的贡献是很有用的。为了帮助进行这样的分析，Buildroot收集关于每个包安装的文件的数据，并使用这些数据，生成一个图表和CSV文件，详细说明不同包的大小贡献。
+当你的目标系统增长时，有时候了解每个Buildroot包对整个根文件系统存储的占用是很有用的。为了帮助进行这样的分析，Buildroot收集关于每个包安装的文件的数据，并使用这些数据，生成一个图表和CSV文件，详细说明不同包的存储占用。
 
 要在构建后生成这些数据，请运行:
 
@@ -1056,9 +1056,9 @@ make graph-size
 
 这将生成:
 
-*   `output/graphs/graph-size.pdf`, 每个包占根文件系统总大小的饼图
-*   `output/graphs/package-size-stats.csv`, 一个CSV文件，给出了每个包对根文件系统总大小的贡献
-*   `output/graphs/file-size-stats.csv`, 一个CSV文件，给出了每个安装文件对其所属包的贡献大小，以及整个文件系统的大小。
+*   `output/graphs/graph-size.pdf`, 每个包占根文件系统总存储的饼图
+*   `output/graphs/package-size-stats.csv`, 一个CSV文件，给出了每个包对根文件系统总存储的占用
+*   `output/graphs/file-size-stats.csv`, 一个CSV文件，给出了每个安装文件对其所属包的存储大小，以及整个文件系统的存储大小。
 
 这个`graph-size`目标需要安装Python Matplotlib库(在大多数发行版上是`python-matplotlib`)，如果你使用的Python版本高于2.7(在大多数发行版上是`python-argparse`)，还需要安装`argparse`模块。
 
@@ -1066,7 +1066,7 @@ make graph-size
 
 此外，可以设置环境变量`BR2_GRAPH_SIZE_OPTS`来进一步控制生成的图。可接受的选项有:
 
-*   `--size-limit X`, `-l X`, 将个人贡献低于`X`百分比的所有包分组到图中标记为其他的单个条目中。默认情况下，`X=0.01`，这意味着每个贡献小于1%的包被分组在其他包之下。可接受的值在`[0.0..1.0]`的范围内。
+*   `--size-limit X`, `-l X`, 将自身占用低于`X`百分比的所有包分组到图中标记为其他的单个条目中。默认情况下，`X=0.01`，这意味着每个占用小于1%的包被分组在其他包之下。可接受的值在`[0.0..1.0]`的范围内。
 *   `--iec`, `--binary`, `--si`, `--decimal`, 使用IEC(二进制，1024的幂)或SI(十进制，1000的幂;默认)前缀。
 *   `--biggest-first`, 按大小递减的顺序而不是大小递增的顺序对包进行排序。
 
@@ -1116,7 +1116,7 @@ Buildroot生成的工具链默认位于`output/host/`。使用它最简单的方
 
 或者，如果你只是想准备SDK而不生成压缩包(例如，因为你只是移动`host`目录，或者将自己生成压缩包)，Buildroot也允许你只使用`make prepare-sdk`来准备SDK而不实际生成压缩包。
 
-为了方便你，通过选择`BR2_PACKAGE_HOST_ENVIRONMENT_SETUP`选项，你可以在`output/host/`中安装一个`environment-setup`脚本，也就是在你的SDK中。这个脚本可以通过`. your/sdk/path/environment-setup`来导出一些环境变量，这些变量将有助于使用Buildroot sdk交叉编译你的项目:`PATH`将包含sdk二进制文件，标准的autotools变量将使用适当的值定义，`CONFIGURE_FLAGS`将包含basic `./configure`选项来交叉编译autotools项目。它还提供了一些有用的命令。但是请注意，一旦这个脚本来源，环境就只能用于交叉编译，而不再用于本地编译。
+为了方便你，通过选择`BR2_PACKAGE_HOST_ENVIRONMENT_SETUP`选项，你可以在`output/host/`中安装一个`environment-setup`脚本，也就是在你的SDK中。这个脚本可以通过`. your/sdk/path/environment-setup`来导出一些环境变量，这些变量将有助于使用Buildroot sdk交叉编译你的项目:`PATH`将包含sdk二进制文件，标准的autotools变量将使用适当的值定义，`CONFIGURE_FLAGS`将包含basic `./configure`选项来交叉编译autotools项目。它还提供了一些有用的命令。但是请注意，一旦这个脚本执行，环境就只能用于交叉编译，而不再用于本地编译。
 
 ### 8.13.2. Using `gdb` in Buildroot
 
@@ -1141,7 +1141,7 @@ gdbserver :2345 foo
 <buildroot>/output/host/bin/<tuple>-gdb -ix <buildroot>/output/staging/usr/share/buildroot/gdbinit foo
 ```
 
-当然，`foo`必须在当前目录中可用，并使用调试符号构建。通常，你从构建`foo`的目录启动这个命令(而不是从`output/target/`启动，因为该目录中的二进制文件被剥离了)。
+当然，`foo`必须在当前目录中可用，并使用调试符号构建。通常，你从构建`foo`的目录启动这个命令(而不是从`output/target/`启动，因为该目录中的二进制文件被剥离(strip)了)。
 
 `<buildroot>/output/staging/usr/share/buildroot/gdbinit`文件将告诉交叉gdb在哪里找到目标的库。
 
@@ -1202,7 +1202,7 @@ export BR2_DL_DIR=<shared download location>
 
 运行`make <package>`将构建并安装特定的包及其依赖项。
 
-对于依赖于Buildroot基础设施的包，有许多特殊的make目标可以独立调用，如下所示:
+对于依赖于Buildroot基础架构的包，有许多特殊的make目标可以独立调用，如下所示:
 
 ```bash
 make <package>-<target>
@@ -1210,7 +1210,7 @@ make <package>-<target>
 
 包构建目标如下(按执行顺序排列):
 
-| 命令/目标          | 描述                                                                           |
+| 命令/<target>     | 描述                                                                            |
 | ----------------- | ------------------------------------------------------------------------------ |
 | `source`          | 获取源代码(下载压缩包、克隆源代码存储库等)                                         |
 | `depends`         | 构建并安装构建包所需的所有依赖项                                                  |
@@ -1224,7 +1224,7 @@ make <package>-<target>
 
 此外，还有一些其他有用的make目标。
 
-| 命令/目标                  | 描述                                                  |
+| 命令/<target>             | 描述                                                  |
 | ------------------------- | ----------------------------------------------------- |
 | `show-depends`            | 显示构建包所需的一阶依赖项                              |
 | `show-recursive-depends`  | 递归地显示构建包所需的依赖项                            |
@@ -1250,7 +1250,7 @@ Buildroot的正常操作是下载一个压缩包，提取它，配置，编译�
 覆盖文件的默认位置是`$(CONFIG_DIR)/local.mk`，由`BR2_PACKAGE_OVERRIDE_FILE`配置选项定义。`$(CONFIG_DIR)`是Buildroot `.config`文件的位置，所以默认情况下`local.mk`与`.config`文件共存，这意味着:
 
 *   在顶层的Buildroot源目录中进行树内构建(即，当不使用`O=`时)
-*   在out-of-tree目录下进行构建(即使用`O=`时)
+*   在树外目录下进行构建(即使用`O=`时)
 
 如果需要不同于这些默认值的位置，可以通过`BR2_PACKAGE_OVERRIDE_FILE`配置选项指定。
 
@@ -1286,7 +1286,7 @@ make busybox-rebuild all
 
 `output/images`中的根文件系统映像包含更新后的BusyBox。
 
-大型项目的源代码树通常包含数百或数千个不需要用于构建的文件，但会减慢使用rsync复制源代码的过程。另外，还可以定义`<pkg>_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS`来跳过从源树同步某些文件。例如，当使用`webkitgtk`包时，以下代码将从本地WebKit源代码树中排除测试和in-tree构建:
+大型项目的源代码树通常包含数百或数千个不需要用于构建的文件，但会减慢使用rsync复制源代码的过程。另外，还可以定义`<pkg>_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS`来跳过从源树同步某些文件。例如，当使用`webkitgtk`包时，以下代码将从本地WebKit源代码树中排除测试和树内构建:
 
 ```bash
 WEBKITGTK_OVERRIDE_SRCDIR = /home/bob/WebKit
@@ -1375,7 +1375,7 @@ LINUX_OVERRIDE_SRCDIR_RSYNC_EXCLUSIONS = --include .git
 
 本章将进一步给出上述文件的详细信息。
 
-注意:如果您选择将此结构放置在Buildroot树之外，但在br2-external树中，<company>可能<boardname>组件可能是多余的，可以被忽略。
+注意:如果您选择将此结构放置在Buildroot树之外，但放置在br2-external树中，则 `company` 和可能的 `boardname` 组件可能是多余的，可以省略。
 
 ### 9.1.1. Implementing layered customizations
 
@@ -1421,7 +1421,7 @@ BR2_GLOBAL_PATCH_DIR="board/<company>/common/patches board/<company>/fooboard/pa
 正如在[第9.1节，“推荐的目录结构”](#91-recommended-directory-structure)中简要提到的那样，您可以将特定于项目的自定义设置放在两个位置:
 
 *   直接在Buildroot树中，通常使用版本控制系统中的分支来维护它们，以便轻松升级到新的Buildroot版本。
-*   在Buildroot树之外，使用br2-external机制。这种机制允许将包配方、板支持和配置文件保存在Buildroot树之外，同时仍然将它们很好地集成到构建逻辑中。我们将这个位置称为br2-external树。本节解释如何使用br2-external机制，以及在br2-external树中提供什么。
+*   在Buildroot树之外，使用br2-external机制。这种机制允许将包配置、板级支持和配置文件保存在Buildroot树之外，同时仍然将它们很好地集成到构建逻辑中。我们将这个位置称为br2-external树。本节解释如何使用br2-external机制，以及在br2-external树中提供什么。
 
 通过将`BR2_EXTERNAL` make变量设置为要使用的br2-external树的路径，可以告诉Buildroot使用一棵或多棵br2-external树。它可以传递给任何Buildroot的`make`调用。它会自动保存在输出目录中隐藏的`.br2-external.mk`文件中。正因为如此，我们不需要在每次调用`make`时都传递`BR2_EXTERNAL`。不过，只要传入一个新值，就可以随时修改它，也可以传入一个空值来删除它。
 
@@ -1474,7 +1474,7 @@ buildroot/ $ make BR2_EXTERNAL= xconfig
 
 #### `external.desc`文件
 
-该文件描述了br2-external树:br2-external树的名称和描述。
+该文件描述了br2-external树: 该br2-external树的名称和描述。
 
 该文件的格式是以行为单位的，每行以一个关键字开头，然后是一个冒号和一个或多个空格，最后是分配给该关键字的值。目前可以识别的关键字有两个:
 
@@ -1916,7 +1916,7 @@ post-image脚本将作为执行Buildroot的用户执行，该用户通常不应�
 
 有关如何为包应用补丁的信息，请参阅[19.2节，“如何应用补丁”](#192-how-patches-are-applied)
 
-`BR2_GLOBAL_PATCH_DIR`选项是为包指定自定义补丁目录的首选方法。它可以用来为buildroot中的任何包指定补丁目录。它还应该用来代替U-Boot和Barebox等包的自定义补丁目录选项。通过这样做，它将允许用户从一个顶级目录管理他们的补丁。
+`BR2_GLOBAL_PATCH_DIR`选项是为包指定自定义补丁目录的首选方法。它可以用来为buildroot中的任何包指定补丁目录。它还应该用来代替U-Boot和Barebox等包的自定义补丁目录选项。通过这样做，它将允许用户从一个顶层目录管理他们的补丁。
 
 `BR2_GLOBAL_PATCH_DIR`是指定自定义补丁的首选方法，但例外情况是`BR2_LINUX_KERNEL_PATCH`。应该使用`BR2_LINUX_KERNEL_PATCH`来指定URL中可用的内核补丁。**注意:** `BR2_LINUX_KERNEL_PATCH`指定在`BR2_GLOBAL_PATCH_DIR`中可用补丁之后应用的内核补丁，因为它是通过Linux包的后补丁钩子完成的。
 
@@ -1999,7 +1999,7 @@ source "package/<company>/package2/Config.in"
 
 ### 10.1.1. DBus daemon
 
-Systemd需要一个DBus守护进程。它有两种选择:传统的dbus (`BR2_PACKAGE_DBUS`)和bus1 dbus-broker (`BR2_PACKAGE_DBUS_BROKER`)。必须至少选择其中一个。如果两者都包含在配置中，则dbus-broker将用作系统总线，但是传统的dbus-守护进程仍然被安装，并且可以用作会话总线。还有它的工具(例如:`dbus-send`)可以使用(systemd本身有`busctl`作为替代)。此外，传统的dbus包是唯一提供`libdbus`的包，它被许多包用作dbus集成库。
+Systemd需要一个DBus守护进程。它有两种选择:传统的dbus (`BR2_PACKAGE_DBUS`)和bus1 dbus-broker (`BR2_PACKAGE_DBUS_BROKER`)。必须至少选择其中一个。如果两者都包含在配置中，则dbus-broker将用作系统总线，但是传统的dbus-daemon仍然被安装，并且可以用作会话总线。还有它的工具(例如:`dbus-send`)可以使用(systemd本身有`busctl`作为替代)。此外，传统的dbus包是唯一提供`libdbus`的包，它被许多包用作dbus集成库。
 
 在dbus和dbus-broker情况下，守护进程都作为用户`dbus`运行。两者的DBus配置文件也是相同的。
 
@@ -2013,9 +2013,9 @@ Systemd需要一个DBus守护进程。它有两种选择:传统的dbus (`BR2_PAC
 
 SELinux有三种操作模式。
 
-*   Disabled: 该政策不适用
+*   Disabled: 策略不应用。
 *   Permissive: 策略被应用，未授权的操作被简单记录。该模式通常用于解决SELinux问题。
-*   Enforcing: 该策略被应用，未授权的操作被拒绝
+*   Enforcing: 该策略被应用，未授权的操作被拒绝。
 
 在Buildroot中，操作模式由`BR2_PACKAGE_REFPOLICY_POLICY_STATE_*`配置选项控制。Linux内核也有各种影响`SELinux`如何启用的配置选项(请参阅Linux内核源代码中的`security/selinux/Kconfig`)。
 
@@ -2829,7 +2829,7 @@ foo needs udev /dev management and a toolchain w/ featA, featB, featC
 
 有些功能可以由多个包提供，例如openGL库。
 
-请参阅[第18.12节，“虚拟包的基础设施”](#1812-infrastructure-for-virtual-packages)了解更多关于虚拟包的信息。
+请参阅[第18.12节，“虚拟包的基础架构”](#1812-infrastructure-for-virtual-packages)了解更多关于虚拟包的信息。
 
 
 ## 18.3. The `.mk` file
@@ -2839,11 +2839,11 @@ foo needs udev /dev management and a toolchain w/ featA, featB, featC
 
 根据包的类型，`.mk`文件必须以不同的方式编写，使用不同的基础架构:
 
-*   **Makefiles for generic packages** (不使用autotools或CMake): 它们基于类似于基于autotools的包所使用的基础架构，但需要开发人员多做一些工作。它们指定了包的配置、编译和安装。所有不使用autotools作为构建系统的包都必须使用此基础设施。将来，可能会为其他构建系统编写其他专门的基础结构。我们会在一个[教程](#1861-generic-package-tutorial)和一个[引用](#1862-generic-package-reference)中全面介绍它们。
-*   **Makefiles for autotools-based software** (autoconf, automake, 等): 我们为这些包提供了专用的基础设施，因为autotools是一个非常常见的构建系统。对于依赖autotools作为构建系统的新包，必须使用此基础设施。我们通过[教程](#1871-autotools-package-tutorial) 和 [引用](#1872-autotools-package-reference)来介绍它们。
-*   **Makefiles for cmake-based software**: 我们为这些包提供了一个专用的基础设施，因为CMake是一个越来越常用的构建系统，并且具有标准化的行为。对于依赖于CMake的新包，必须使用此基础架构。我们通过[教程](#1881-cmake-package-tutorial) 和 [引用](#1882-cmake-package-reference)来介绍它们。
+*   **Makefiles for generic packages** (不使用autotools或CMake): 它们基于类似于基于autotools的包所使用的基础架构，但需要开发人员多做一些工作。它们指定了包的配置、编译和安装。所有不使用autotools作为构建系统的包都必须使用此基础架构。将来，可能会为其他构建系统编写其他专门的基础结构。我们会在一个[教程](#1861-generic-package-tutorial)和一个[引用](#1862-generic-package-reference)中全面介绍它们。
+*   **Makefiles for autotools-based software** (autoconf, automake, 等): 我们为这些包提供了专用的基础架构，因为autotools是一个非常常见的构建系统。对于依赖autotools作为构建系统的新包，必须使用此基础架构。我们通过[教程](#1871-autotools-package-tutorial) 和 [引用](#1872-autotools-package-reference)来介绍它们。
+*   **Makefiles for cmake-based software**: 我们为这些包提供了一个专用的基础架构，因为CMake是一个越来越常用的构建系统，并且具有标准化的行为。对于依赖于CMake的新包，必须使用此基础架构。我们通过[教程](#1881-cmake-package-tutorial) 和 [引用](#1882-cmake-package-reference)来介绍它们。
 *   **Makefiles for Python modules**: 我们有一个专门的Python模块基础架构，使用`distutils`, `flit`, `pep517` 或 `setuptools`机制。我们会通过一个[教程](#1891-python-package-tutorial)和一个[引用](#1892-python-package-reference)来介绍它们。
-*   **Makefiles for Lua modules**: 我们有一个专门的Lua模块的基础设施，可以通过LuaRocks网站获得。我们通过一个[教程](#18101-luarocks-package-tutorial)和一个[引用](#18102-luarocks-package-reference)来介绍它们。
+*   **Makefiles for Lua modules**: 我们有一个专门的Lua模块的基础架构，可以通过LuaRocks网站获得。我们通过一个[教程](#18101-luarocks-package-tutorial)和一个[引用](#18102-luarocks-package-reference)来介绍它们。
 
 进一步的格式化细节:参见 [写作规则](#162-the-mk-file).
 
@@ -3140,10 +3140,10 @@ $(eval $(host-generic-package))
     
 *   可以将`LIBFOO_GIT_SUBMODULES`设置为`YES`来在仓库中创建一个git子模块的归档。这仅适用于通过git下载的包(即`LIBFOO_SITE_METHOD=git`)。注意，当git子模块包含打包的库时，我们尽量不使用这些git子模块，在这种情况下，我们更喜欢使用它们自己的包中的库。
 *   如果Git仓库使用Git LFS在带外存储大文件，则`LIBFOO_GIT_LFS`应该设置为`YES`。这仅适用于通过git下载的包(即`LIBFOO_SITE_METHOD=git`)。
-*   `LIBFOO_STRIP_COMPONENTS`是tar解压时必须从文件名中剥离的主要组件(目录)的数量。大多数包的压缩包都有一个名为"<pkg-name>-<pkg-version>"的主组件，因此Buildroot将--strip-components=1传递给tar以删除它。对于没有这个组件的非标准包，或者有多个要剥离的前导组件，用要传递给tar的值设置这个变量。默认值:1。
+*   `LIBFOO_STRIP_COMPONENTS`是tar解压时必须从文件名中剥离(strip)的主要组件(目录)的数量。大多数包的压缩包都有一个名为"<pkg-name>-<pkg-version>"的主组件，因此Buildroot将--strip-components=1传递给tar以删除它。对于没有这个组件的非标准包，或者有多个要剥离(strip)的前导组件，用要传递给tar的值设置这个变量。默认值:1。
 *   `LIBFOO_EXCLUDES`是一个以空格分隔的模式列表，在提取归档时需要排除。列表中的每一项都作为tar的`--exclude`选项传递。默认为空。
 *   `LIBFOO_DEPENDENCIES`列出了当前目标包编译所需的依赖项(根据包名)。这些依赖项保证在当前包的配置开始之前被编译和安装。但是，对这些依赖项配置的修改不会强制重新构建当前包。类似地，`HOST_LIBFOO_DEPENDENCIES`列出了当前主机包的依赖项。
-*   `LIBFOO_EXTRACT_DEPENDENCIES`根据包名列出了当前目标包提取所需的依赖项。这些依赖项保证在当前包的提取步骤开始之前被编译和安装。这仅由包基础设施内部使用，通常不应由包直接使用。
+*   `LIBFOO_EXTRACT_DEPENDENCIES`根据包名列出了当前目标包提取所需的依赖项。这些依赖项保证在当前包的提取步骤开始之前被编译和安装。这仅由包基础架构内部使用，通常不应由包直接使用。
 *   `LIBFOO_PATCH_DEPENDENCIES`列出了当前包需要打补丁的依赖项(根据包名)。在为当前包打补丁之前，这些依赖项可以保证被提取并打补丁(但不一定是构建)。类似地，`HOST_LIBFOO_PATCH_DEPENDENCIES`列出了当前主机包的依赖项。这很少使用;通常，`LIBFOO_DEPENDENCIES`才是你真正想要使用的。
 *   `LIBFOO_PROVIDES`列出了`libfoo`实现的所有虚拟包。参见[章节18.12，“虚拟包的基础架构”](#1812-infrastructure-for-virtual-packages)。
 *   `LIBFOO_INSTALL_STAGING`可以设置为`YES`或`NO`(默认值)。如果设置为“YES”，那么将执行`LIBFOO_INSTALL_STAGING_CMDS`变量中的命令，将包安装到过渡目录中。
@@ -3182,7 +3182,7 @@ LIBFOO_IGNORE_CVES += CVE-2020-54321
     *   `LIBFOO_CPE_ID_VERSION`, 指定CPE标识符的版本部分。当未定义时，默认值是`$(LIBFOO_VERSION)`。
     *   `LIBFOO_CPE_ID_UPDATE` 指定CPE标识符的更新部分。当未定义时，默认值为`*`。
     
-    如果定义了这些变量中的任何一个，那么通用包基础设施将假定包提供了有效的CPE信息。在这种情况下，通用的包基础架构将定义`LIBFOO_CPE_ID`。
+    如果定义了这些变量中的任何一个，那么通用包基础架构将假定包提供了有效的CPE信息。在这种情况下，通用的包基础架构将定义`LIBFOO_CPE_ID`。
     
     对于主包来说，如果它的`LIBFOO_CPE_ID_*`变量没有定义，它就会从相应的目标包中继承这些变量的值。
     
@@ -3195,7 +3195,7 @@ LIBFOO_VERSION = 2.32
 
 现在是定义在构建过程的不同步骤中应该执行什么操作的变量。
 
-*   `LIBFOO_EXTRACT_CMDS`列出了提取包需要执行的操作。这通常是不需要的，因为tar包由Buildroot自动处理。但是，如果包使用非标准的归档格式，例如ZIP或RAR文件，或者具有非标准组织的压缩包，则此变量允许覆盖包基础设施的默认行为。
+*   `LIBFOO_EXTRACT_CMDS`列出了提取包需要执行的操作。这通常是不需要的，因为tar包由Buildroot自动处理。但是，如果包使用非标准的归档格式，例如ZIP或RAR文件，或者具有非标准组织的压缩包，则此变量允许覆盖包基础架构的默认行为。
 *   `LIBFOO_CONFIGURE_CMDS`列出了在编译包之前需要执行的配置操作。
 *   `LIBFOO_BUILD_CMDS`列出了编译包时需要执行的操作。
 *   当包是主机包时，`HOST_LIBFOO_INSTALL_CMDS`列出了安装包需要执行的操作。该包必须将其文件安装到`$(HOST_DIR)`指定的目录中。应该安装所有文件，包括开发文件(如头文件)，因为其他包可能在此包之上编译。
@@ -3223,7 +3223,7 @@ endef
 *   `$(LIBFOO_DL_DIR)` 包含Buildroot为`libfoo`下载的所有文件所在的目录路径。
 *   `$(TARGET_CC)`, `$(TARGET_LD)`, 等，以获得目标交叉编译实用程序。
 *   `$(TARGET_CROSS)` 获取交叉编译工具链前缀
-*   当然，需要使用`$(HOST_DIR)`, `$(STAGING_DIR)` 和 `$(TARGET_DIR)`变量来正确安装包。这些变量指向全局的主机、暂存和目标目录，除非使用了每个包目录支持，在这种情况下，它们指向当前包主机、暂存和目标目录。在这两种情况下，从包的角度来看没有任何区别:它应该简单地使用`HOST_DIR`, `STAGING_DIR` 和 `TARGET_DIR`。请参阅[第8.12节，“顶级并行构建”](#812-top-level-parallel-build)了解关于每个包目录支持的更多细节。
+*   当然，需要使用`$(HOST_DIR)`, `$(STAGING_DIR)` 和 `$(TARGET_DIR)`变量来正确安装包。这些变量指向全局的主机、暂存和目标目录，除非使用了每个包目录支持，在这种情况下，它们指向当前包主机、暂存和目标目录。在这两种情况下，从包的角度来看没有任何区别:它应该简单地使用`HOST_DIR`, `STAGING_DIR` 和 `TARGET_DIR`。请参阅[第8.12节，“顶层并行构建”](#812-top-level-parallel-build)了解关于每个包目录支持的更多细节。
 
 最后，你也可以使用hooks。参见 [18.23节“不同构建步骤中可用的钩子”](#1823-hooks-available-in-the-various-build-steps) 获取更多信息。
 
@@ -3273,7 +3273,7 @@ autotools包基础架构的主要宏是`autotools-package`。它类似于`generi
 
 就像通用基础结构一样，autotools基础结构通过在调用`autotools-package`宏之前定义许多变量来工作。
 
-首先，在通用基础设施中存在的所有包元数据信息变量也存在于autotools基础设施中: `LIBFOO_VERSION`, `LIBFOO_SOURCE`, `LIBFOO_PATCH`, `LIBFOO_SITE`, `LIBFOO_SUBDIR`, `LIBFOO_DEPENDENCIES`, `LIBFOO_INSTALL_STAGING`, `LIBFOO_INSTALL_TARGET`.
+首先，在通用基础架构中存在的所有包元数据信息变量也存在于autotools基础架构中: `LIBFOO_VERSION`, `LIBFOO_SOURCE`, `LIBFOO_PATCH`, `LIBFOO_SITE`, `LIBFOO_SUBDIR`, `LIBFOO_DEPENDENCIES`, `LIBFOO_INSTALL_STAGING`, `LIBFOO_INSTALL_TARGET`.
 
 还可以定义一些特定于autotools基础架构的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包只会使用其中的一些。
 
@@ -3286,12 +3286,12 @@ autotools包基础架构的主要宏是`autotools-package`。它类似于`generi
 *   `LIBFOO_AUTORECONF`, 告诉包是否应该被自动重新配置(即配置脚本和Makefile。在文件中应该通过重新运行autoconf, automake, libtool等重新生成)。有效值是`YES`和`NO`。默认值为`NO`。
 *   `LIBFOO_AUTORECONF_ENV`, 如果`LIBFOO_AUTORECONF=YES`，则指定额外的环境变量传递给autoreconf程序。这些参数是在autoreconf命令的环境中传递的。默认为空。
 *   `LIBFOO_AUTORECONF_OPTS` 如果`LIBFOO_AUTORECONF=YES`，则指定传递给autoreconf程序的其他选项。默认为空。
-*   `LIBFOO_AUTOPOINT`, 告诉包是否应该被自动指向(即包是否需要复制I18N基础设施)。仅当`LIBFOO_AUTORECONF=YES`时有效。有效值是`YES`和`NO`。默认值是`NO`。
+*   `LIBFOO_AUTOPOINT`, 告诉包是否应该被自动指向(即包是否需要复制I18N基础架构)。仅当`LIBFOO_AUTORECONF=YES`时有效。有效值是`YES`和`NO`。默认值是`NO`。
 *   `LIBFOO_LIBTOOL_PATCH` 说明是否应该应用用于修复libtool交叉编译问题的Buildroot补丁。有效值是`YES`和`NO`。默认值为`YES`。
 *   `LIBFOO_INSTALL_STAGING_OPTS` 包含用于将包安装到过渡目录的make选项。默认值是`DESTDIR=$(STAGING_DIR) install`，这对于大多数autotools包都是正确的。仍然可以覆盖它。
 *   `LIBFOO_INSTALL_TARGET_OPTS` 包含用于将包安装到目标目录的make选项。默认值为`DESTDIR=$(TARGET_DIR) install`。大多数autotools包的默认值都是正确的，但如果需要，仍然可以覆盖它。
 
-使用autotools基础设施，已经定义了构建和安装包所需的所有步骤，并且它们通常适用于大多数基于autotools的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
+使用autotools基础架构，已经定义了构建和安装包所需的所有步骤，并且它们通常适用于大多数基于autotools的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
 
 *   通过添加一个操作后钩子(在提取、打补丁、配置、构建或安装之后)。请参阅[18.23节“不同构建步骤中可用的钩子”](#1823-hooks-available-in-the-various-build-steps)了解详情。
 *   通过重写其中一个步骤。例如，即使使用了autotools基础架构，如果包中的`.mk`文件定义了自己的`LIBFOO_CONFIGURE_CMDS`变量，它将被使用，而不是默认的autotools变量。但是，应该限制在非常特殊的情况下使用这种方法。一般情况下不要使用它。
@@ -3348,7 +3348,7 @@ CMake包基础架构的主要宏是`cmake-package`。它类似于`generic-packag
 
 *   `LIBFOO_SUBDIR`可能包含包中包含主CMakeLists.txt文件的子目录的名称。例如，如果主CMakeLists.txt文件不在压缩包解压出来的树的根目录中，这就很有用。如果未指定`HOST_LIBFOO_SUBDIR`，则默认为`LIBFOO_SUBDIR`。
 *   `LIBFOO_CONF_ENV`, 指定传递给CMake的附加环境变量。默认为空。
-*   `LIBFOO_CONF_OPTS`, 指定传递给CMake的附加配置选项。默认为空。许多常见的CMake选项由`cmake-package`基础设施设置;所以通常不需要在包的`*.mk`文件中设置它们，除非你想覆盖它们:
+*   `LIBFOO_CONF_OPTS`, 指定传递给CMake的附加配置选项。默认为空。许多常见的CMake选项由`cmake-package`基础架构设置;所以通常不需要在包的`*.mk`文件中设置它们，除非你想覆盖它们:
     
     *   `CMAKE_BUILD_TYPE`由`BR2_ENABLE_RUNTIME_DEBUG`驱动;
     *   `CMAKE_INSTALL_PREFIX`;
@@ -3365,7 +3365,7 @@ CMake包基础架构的主要宏是`cmake-package`。它类似于`generic-packag
 *   `LIBFOO_INSTALL_STAGING_OPTS` 包含用于将包安装到过渡目录的make选项。默认值是`DESTDIR=$(STAGING_DIR) install/fast`，这对于大多数CMake包都是正确的。仍然可以覆盖它。
 *   `LIBFOO_INSTALL_TARGET_OPTS` 包含用于将包安装到目标目录的make选项。默认值为`DESTDIR=$(TARGET_DIR) install/fast`。对于大多数CMake包来说，默认值是正确的，但如果需要，仍然可以覆盖它。
 
-有了CMake基础设施，构建和安装包所需的所有步骤都已经定义好了，它们通常适用于大多数基于CMake的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
+有了CMake基础架构，构建和安装包所需的所有步骤都已经定义好了，它们通常适用于大多数基于CMake的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
 
 *   通过添加一个操作后钩子(在提取、打补丁、配置、构建或安装之后)。请参阅[18.23节“不同构建步骤中可用的钩子”](#1823-hooks-available-in-the-various-build-steps)了解详情。
 *   通过重写其中一个步骤。例如，即使使用了CMake基础架构，如果包中的`.mk`文件定义了自己的`LIBFOO_CONFIGURE_CMDS`变量，它将被使用，而不是默认的CMake变量。但是，应该限制在非常特殊的情况下使用这种方法。一般情况下不要使用它。
@@ -3421,25 +3421,25 @@ Python包基础架构的主要宏是`python-package`。它类似于`generic-pack
 
 就像通用基础架构一样，Python基础架构的工作原理是在调用`python-package`或`host-python-package`宏之前定义许多变量。
 
-[通用包基础架构](#1862-generic-package-reference)中存在的所有包元数据信息变量也存在于Python基础设施中: `PYTHON_FOO_VERSION`, `PYTHON_FOO_SOURCE`, `PYTHON_FOO_PATCH`, `PYTHON_FOO_SITE`, `PYTHON_FOO_SUBDIR`, `PYTHON_FOO_DEPENDENCIES`, `PYTHON_FOO_LICENSE`, `PYTHON_FOO_LICENSE_FILES`, `PYTHON_FOO_INSTALL_STAGING`, 等.
+[通用包基础架构](#1862-generic-package-reference)中存在的所有包元数据信息变量也存在于Python基础架构中: `PYTHON_FOO_VERSION`, `PYTHON_FOO_SOURCE`, `PYTHON_FOO_PATCH`, `PYTHON_FOO_SITE`, `PYTHON_FOO_SUBDIR`, `PYTHON_FOO_DEPENDENCIES`, `PYTHON_FOO_LICENSE`, `PYTHON_FOO_LICENSE_FILES`, `PYTHON_FOO_INSTALL_STAGING`, 等.
 
 注意:
 
-*   没有必要在包的`PYTHON_FOO_DEPENDENCIES`变量中添加`python`或`host-python`，因为这些基本依赖项会根据python包基础设施的需要自动添加。
-*   类似地，对于基于setuptools的包，不需要将`host-setuptools`添加到`PYTHON_FOO_DEPENDENCIES`，因为它会由Python基础设施根据需要自动添加。
+*   没有必要在包的`PYTHON_FOO_DEPENDENCIES`变量中添加`python`或`host-python`，因为这些基本依赖项会根据python包基础架构的需要自动添加。
+*   类似地，对于基于setuptools的包，不需要将`host-setuptools`添加到`PYTHON_FOO_DEPENDENCIES`，因为它会由Python基础架构根据需要自动添加。
 
 有一个特定于Python基础架构的变量是必须的:
 
-*   `PYTHON_FOO_SETUP_TYPE`, 来定义包使用的Python构建系统。支持的四个值是`distutils`, `flit`, `pep517` 和 `setuptools`。如果你不知道你的包中使用了哪个，请查看包源代码中的`setup.py`或`pyproject.toml`文件，并查看它是否从`distutils`、`flit`模块或`setuptools`模块中导入内容。如果包正在使用`pyproject.toml`。如果使用本地in-tree后端路径，则应该使用`pep517`。
+*   `PYTHON_FOO_SETUP_TYPE`, 来定义包使用的Python构建系统。支持的四个值是`distutils`, `flit`, `pep517` 和 `setuptools`。如果你不知道你的包中使用了哪个，请查看包源代码中的`setup.py`或`pyproject.toml`文件，并查看它是否从`distutils`、`flit`模块或`setuptools`模块中导入内容。如果包正在使用`pyproject.toml`。如果使用本地树内后端路径，则应该使用`pep517`。
 
-根据包的需求，可以选择性地定义一些特定于Python基础设施的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包将只使用其中的一些，或完全不使用。
+根据包的需求，可以选择性地定义一些特定于Python基础架构的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包将只使用其中的一些，或完全不使用。
 
 *   `PYTHON_FOO_SUBDIR`可能包含包中子目录的名称，该包包含主文件`setup.py`或`pyproject.toml`。例如，如果主文件`setup.py`或`pyproject.toml`不在压缩包解压后的树的根目录中，这就很有用。如果未指定`HOST_PYTHON_FOO_SUBDIR`，则默认为`PYTHON_FOO_SUBDIR`。
-*   `PYTHON_FOO_ENV`, 指定额外的环境变量，将其传递给Python的`setup.py`脚本(用于distutils/setuptools包)或`support/scripts/pyinstaller.py`脚本(用于flit/pep517包)，用于构建和安装步骤。请注意，基础设施会自动传递几个标准变量，定义在`PKG_PYTHON_DISTUTILS_ENV`(用于distutils目标包)、`PKG_PYTHON_SETUPTOOLS_ENV`(用于setuptools目标包)、`HOST_PKG_PYTHON_SETUPTOOLS_ENV`(用于setuptools目标包)、`PKG_PYTHON_PEP517_ENV`(用于flit/pep517目标包)和`HOST_PKG_PYTHON_PEP517_ENV`(用于flit/pep517主机包)中。
-*   `PYTHON_FOO_BUILD_OPTS`, 要指定在构建步骤中传递给Python `setup.py`脚本的其他选项，通常只对基于distutils/setuptools的包有意义，因为基于flit/pep517的包不会将这些选项传递给`setup.py`脚本，而是将它们传递给`support/scripts/pyinstaller.py`。对于目标distutils包，基础设施已经自动传递了`PKG_PYTHON_DISTUTILS_BUILD_OPTS`选项。
-*   `PYTHON_FOO_INSTALL_TARGET_OPTS`, `PYTHON_FOO_INSTALL_STAGING_OPTS`, `HOST_PYTHON_FOO_INSTALL_OPTS` 要指定在目标安装步骤、临时安装步骤或主机安装期间传递给Python `setup.py`脚本(用于distutils/setuptools包)或`support/scripts/pyinstaller.py`(用于flit/pep517包)的其他选项。请注意，基础设施自动传递一些选项，定义在`PKG_PYTHON_DISTUTILS_INSTALL_TARGET_OPTS`或`PKG_PYTHON_DISTUTILS_INSTALL_STAGING_OPTS`(针对目标distutils包)，`HOST_PKG_PYTHON_DISTUTILS_INSTALL_OPTS`(针对主机distutils包)，`PKG_PYTHON_SETUPTOOLS_INSTALL_TARGET_OPTS`或`PKG_PYTHON_SETUPTOOLS_INSTALL_STAGING_OPTS`(针对目标setuptools包)，`HOST_PKG_PYTHON_SETUPTOOLS_INSTALL_OPTS`(用于主机setuptools包)和`PKG_PYTHON_PEP517_INSTALL_TARGET_OPTS`或`PKG_PYTHON_PEP517_INSTALL_STAGING_OPTS`(用于目标flit/pep517包)。
+*   `PYTHON_FOO_ENV`, 指定额外的环境变量，将其传递给Python的`setup.py`脚本(用于distutils/setuptools包)或`support/scripts/pyinstaller.py`脚本(用于flit/pep517包)，用于构建和安装步骤。请注意，基础架构会自动传递几个标准变量，定义在`PKG_PYTHON_DISTUTILS_ENV`(用于distutils目标包)、`PKG_PYTHON_SETUPTOOLS_ENV`(用于setuptools目标包)、`HOST_PKG_PYTHON_SETUPTOOLS_ENV`(用于setuptools目标包)、`PKG_PYTHON_PEP517_ENV`(用于flit/pep517目标包)和`HOST_PKG_PYTHON_PEP517_ENV`(用于flit/pep517主机包)中。
+*   `PYTHON_FOO_BUILD_OPTS`, 要指定在构建步骤中传递给Python `setup.py`脚本的其他选项，通常只对基于distutils/setuptools的包有意义，因为基于flit/pep517的包不会将这些选项传递给`setup.py`脚本，而是将它们传递给`support/scripts/pyinstaller.py`。对于目标distutils包，基础架构已经自动传递了`PKG_PYTHON_DISTUTILS_BUILD_OPTS`选项。
+*   `PYTHON_FOO_INSTALL_TARGET_OPTS`, `PYTHON_FOO_INSTALL_STAGING_OPTS`, `HOST_PYTHON_FOO_INSTALL_OPTS` 要指定在目标安装步骤、临时安装步骤或主机安装期间传递给Python `setup.py`脚本(用于distutils/setuptools包)或`support/scripts/pyinstaller.py`(用于flit/pep517包)的其他选项。请注意，基础架构自动传递一些选项，定义在`PKG_PYTHON_DISTUTILS_INSTALL_TARGET_OPTS`或`PKG_PYTHON_DISTUTILS_INSTALL_STAGING_OPTS`(针对目标distutils包)，`HOST_PKG_PYTHON_DISTUTILS_INSTALL_OPTS`(针对主机distutils包)，`PKG_PYTHON_SETUPTOOLS_INSTALL_TARGET_OPTS`或`PKG_PYTHON_SETUPTOOLS_INSTALL_STAGING_OPTS`(针对目标setuptools包)，`HOST_PKG_PYTHON_SETUPTOOLS_INSTALL_OPTS`(用于主机setuptools包)和`PKG_PYTHON_PEP517_INSTALL_TARGET_OPTS`或`PKG_PYTHON_PEP517_INSTALL_STAGING_OPTS`(用于目标flit/pep517包)。
 
-有了Python基础设施，构建和安装包所需的所有步骤都已经定义好了，它们通常适用于大多数基于Python的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
+有了Python基础架构，构建和安装包所需的所有步骤都已经定义好了，它们通常适用于大多数基于Python的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
 
 *   通过添加一个操作后钩子(在提取、打补丁、配置、构建或安装之后)。请参阅[第18.23节，“在各种构建步骤中可用的钩子”](#1823-hooks-available-in-the-various-build-steps)了解详情。
 *   通过重写其中一个步骤。例如，即使使用了Python基础架构，如果包`.mk`文件定义了自己的`PYTHON_FOO_BUILD_CMDS`变量，它将被使用，而不是默认的Python变量。但是，应该限制在非常特殊的情况下使用这种方法。一般情况下不要使用它。
@@ -3553,15 +3553,15 @@ $(eval $(python-package))
 
 ### 18.10.2. `luarocks-package` reference
 
-LuaRocks是一个Lua模块的部署和管理系统，支持各种`build.type`: `builtin`, `make` 和 `cmake`。在Buildroot的上下文中，`luarocks-package`基础设施只支持`builtin`模式。使用`make`或`cmake`构建机制的luarock包应该分别使用Buildroot中的`generic-package` 和 `cmake-package`基础架构进行打包。
+LuaRocks是一个Lua模块的部署和管理系统，支持各种`build.type`: `builtin`, `make` 和 `cmake`。在Buildroot的上下文中，`luarocks-package`基础架构只支持`builtin`模式。使用`make`或`cmake`构建机制的luarock包应该分别使用Buildroot中的`generic-package` 和 `cmake-package`基础架构进行打包。
 
 LuaRocks包基础架构的主要宏是`luarocks-package`:像`generic-package`一样，它通过定义一些提供包元数据信息的变量来工作，然后调用`luarocks-package`。
 
 就像通用基础架构一样，LuaRocks基础架构通过在调用`luarocks-package`宏之前定义许多变量来工作。
 
-首先，存在于通用基础设施中的所有包元数据信息变量也存在于LuaRocks基础设施中: `LUA_FOO_VERSION`, `LUA_FOO_SOURCE`, `LUA_FOO_SITE`, `LUA_FOO_DEPENDENCIES`, `LUA_FOO_LICENSE`, `LUA_FOO_LICENSE_FILES`.
+首先，存在于通用基础架构中的所有包元数据信息变量也存在于LuaRocks基础架构中: `LUA_FOO_VERSION`, `LUA_FOO_SOURCE`, `LUA_FOO_SITE`, `LUA_FOO_DEPENDENCIES`, `LUA_FOO_LICENSE`, `LUA_FOO_LICENSE_FILES`.
 
-其中两个由LuaRocks基础设施填充(用于“下载”步骤)。如果你的包没有托管在LuaRocks镜像`$(BR2_LUAROCKS_MIRROR)`上，你可以覆盖它们:
+其中两个由LuaRocks基础架构填充(用于“下载”步骤)。如果你的包没有托管在LuaRocks镜像`$(BR2_LUAROCKS_MIRROR)`上，你可以覆盖它们:
 
 *   `LUA_FOO_SITE`, 默认为 `$(BR2_LUAROCKS_MIRROR)`
 *   `LUA_FOO_SOURCE`, 默认为 `$(lowercase LUA_FOO_NAME_UPSTREAM)-$(LUA_FOO_VERSION).src.rock`
@@ -3626,7 +3626,7 @@ Perl/CPAN包基础架构的主要宏是`perl-package`。它类似于`generic-pac
 
 就像一般的基础结构一样，Perl/CPAN基础结构通过在调用`perl-package`宏之前定义许多变量来工作。
 
-首先，存在于通用基础设施中的所有包元数据信息变量也存在于Perl/CPAN基础设施中: `PERL_FOO_VERSION`, `PERL_FOO_SOURCE`, `PERL_FOO_PATCH`, `PERL_FOO_SITE`, `PERL_FOO_SUBDIR`, `PERL_FOO_DEPENDENCIES`, `PERL_FOO_INSTALL_TARGET`.
+首先，存在于通用基础架构中的所有包元数据信息变量也存在于Perl/CPAN基础架构中: `PERL_FOO_VERSION`, `PERL_FOO_SOURCE`, `PERL_FOO_PATCH`, `PERL_FOO_SITE`, `PERL_FOO_SUBDIR`, `PERL_FOO_DEPENDENCIES`, `PERL_FOO_INSTALL_TARGET`.
 
 请注意，除非定义了`PERL_FOO_INSTALL_STAGING_CMDS`变量，否则将`PERL_FOO_INSTALL_STAGING`设置为`YES`是无效的。perl基础架构没有定义这些命令，因为perl模块通常不需要安装到`staging`目录。
 
@@ -3836,7 +3836,7 @@ $(eval $(kconfig-package))
 
 首先，存在于通用基础架构中的所有包元数据信息变量也存在于`rebar`基础架构中: `ERLANG_FOOBAR_VERSION`, `ERLANG_FOOBAR_SOURCE`, `ERLANG_FOOBAR_PATCH`, `ERLANG_FOOBAR_SITE`, `ERLANG_FOOBAR_SUBDIR`, `ERLANG_FOOBAR_DEPENDENCIES`, `ERLANG_FOOBAR_INSTALL_STAGING`, `ERLANG_FOOBAR_INSTALL_TARGET`, `ERLANG_FOOBAR_LICENSE` 和 `ERLANG_FOOBAR_LICENSE_FILES`.
 
-还可以定义一些特定于`rebar`基础设施的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包只会使用其中的一些。
+还可以定义一些特定于`rebar`基础架构的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包只会使用其中的一些。
 
 *   `ERLANG_FOOBAR_USE_AUTOCONF`, 指定包在配置步骤中使用autoconf。当一个包将此变量设置为`YES`时，将使用`autotools`基础架构。
     
@@ -3847,12 +3847,12 @@ $(eval $(kconfig-package))
     **注意.** 如果该包打包了一个rebar实用程序，但可以使用Buildroot提供的通用工具，只需说`NO`(即不指定此变量)。仅当必须使用此包中捆绑的rebar实用程序时设置。
     
 *   `ERLANG_FOOBAR_REBAR_ENV`, 指定传递给rebar实用程序的附加环境变量。
-*   `ERLANG_FOOBAR_KEEP_DEPENDENCIES`, 以保持rebar.config文件中描述的依赖项。有效值是`YES`或`NO`(默认值)。除非此变量设置为`YES`，否则rebar基础设施将在补丁后钩子中删除此类依赖项，以确保rebar不会下载或编译它们。
+*   `ERLANG_FOOBAR_KEEP_DEPENDENCIES`, 以保持rebar.config文件中描述的依赖项。有效值是`YES`或`NO`(默认值)。除非此变量设置为`YES`，否则rebar基础架构将在补丁后钩子中删除此类依赖项，以确保rebar不会下载或编译它们。
 
-使用rebar基础设施，已经定义了构建和安装包所需的所有步骤，它们通常适用于大多数基于rebar的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
+使用rebar基础架构，已经定义了构建和安装包所需的所有步骤，它们通常适用于大多数基于rebar的包。但是，在需要时，仍然可以自定义任何特定步骤的操作:
 
 *   通过添加一个操作后钩子(在提取、打补丁、配置、构建或安装之后)。参见 [18.23节，“不同构建步骤中可用的钩子”](#1823-hooks-available-in-the-various-build-steps) 获取更多信息。
-*   通过重写其中一个步骤。例如，即使使用了钢筋基础设施，如果包`.mk`文件定义了自己的`ERLANG_FOOBAR_BUILD_CMDS`变量，它将被使用，而不是默认的rebar变量。但是，应该限制在非常特殊的情况下使用这种方法。一般情况下不要使用它。
+*   通过重写其中一个步骤。例如，即使使用了钢筋基础架构，如果包`.mk`文件定义了自己的`ERLANG_FOOBAR_BUILD_CMDS`变量，它将被使用，而不是默认的rebar变量。但是，应该限制在非常特殊的情况下使用这种方法。一般情况下不要使用它。
 
 
 ## 18.15. Infrastructure for Waf-based packages
@@ -3948,7 +3948,7 @@ Makefile从包声明的标准变量的定义开始(第7行到第11行)。
 
 在这个例子中，`host-pkgconf`和`bar`在第14行`FOO_DEPENDENCIES`中被声明为依赖项，因为`foo`的Meson构建文件使用`pkg-config`来确定`bar`包的编译标志和库。
 
-请注意，没有必要在包的`FOO_DEPENDENCIES`变量中添加`host-meson`，因为这个基本依赖项会根据Meson包基础设施的需要自动添加。
+请注意，没有必要在包的`FOO_DEPENDENCIES`变量中添加`host-meson`，因为这个基本依赖项会根据Meson包基础架构的需要自动添加。
 
 如果选中了“baz”包，那么通过在第17行向`FOO_CONF_OPTS`添加`-Dbaz=true`来激活“foo”中对“baz”特性的支持，如“foo”源代码树中的`meson_options.txt`文件中指定的那样。“baz”包也被添加到`FOO_DEPENDENCIES`中。请注意，如果没有选择包，对`baz`的支持在第20行显式禁用。
 
@@ -4016,19 +4016,19 @@ Cargo是Rust编程语言的包管理器。它允许用户构建用Rust编写的�
 
 Makefile从包声明的标准变量的定义开始(第7行到第11行)。
 
-如第13行所示，它基于`cargo-package`基础设施。Cargo将由此基础设施自动调用，以构建和安装包。
+如第13行所示，它基于`cargo-package`基础架构。Cargo将由此基础架构自动调用，以构建和安装包。
 
-仍然可以定义自定义的构建命令或安装命令(即FOO_BUILD_CMDS和FOO_INSTALL_TARGET_CMDS)。这些将取代来自货运基础设施的命令。
+仍然可以定义自定义的构建命令或安装命令(即FOO_BUILD_CMDS和FOO_INSTALL_TARGET_CMDS)。这些将取代来自货运基础架构的命令。
 
 ### 18.17.2. `cargo-package` reference
 
-Cargo包基础设施的主要宏是目标包的`cargo-package`和主包的`host-cargo-package`。
+Cargo包基础架构的主要宏是目标包的`cargo-package`和主包的`host-cargo-package`。
 
 就像通用基础结构一样，Cargo基础结构通过在调用`cargo-package` 或 `host-cargo-package`宏之前定义一系列变量来工作。
 
-首先，存在于通用基础设施中的所有包元数据信息变量也存在于Cargo基础架构中: `FOO_VERSION`, `FOO_SOURCE`, `FOO_PATCH`, `FOO_SITE`, `FOO_DEPENDENCIES`, `FOO_LICENSE`, `FOO_LICENSE_FILES`, 等.
+首先，存在于通用基础架构中的所有包元数据信息变量也存在于Cargo基础架构中: `FOO_VERSION`, `FOO_SOURCE`, `FOO_PATCH`, `FOO_SITE`, `FOO_DEPENDENCIES`, `FOO_LICENSE`, `FOO_LICENSE_FILES`, 等.
 
-还可以定义一些特定于Cargo基础设施的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包只会使用其中的一些。
+还可以定义一些特定于Cargo基础架构的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包只会使用其中的一些。
 
 *   `FOO_SUBDIR`可能包含包含Cargo.toml文件的包中的子目录的名称。例如，如果它不在由压缩包提取的树的根目录中，那么这是有用的。如果未指定`HOST_FOO_SUBDIR`，则默认为`FOO_SUBDIR`。
 *   `FOO_CARGO_ENV`可用于在`cargo`调用环境中传递额外的变量。它在构建和安装时都使用。
@@ -4082,11 +4082,11 @@ Go包基础架构的主要宏是`golang-package`。它类似于`generic-package`
 
 [通用包基础架构](#1862-generic-package-reference)中存在的所有包元数据信息变量也存在于Go基础架构中: `FOO_VERSION`, `FOO_SOURCE`, `FOO_PATCH`, `FOO_SITE`, `FOO_SUBDIR`, `FOO_DEPENDENCIES`, `FOO_LICENSE`, `FOO_LICENSE_FILES`, `FOO_INSTALL_STAGING`, 等。
 
-请注意，没有必要在包的`FOO_DEPENDENCIES`变量中添加`host-go`，因为这个基本依赖项会根据Go包基础设施的需要自动添加。
+请注意，没有必要在包的`FOO_DEPENDENCIES`变量中添加`host-go`，因为这个基本依赖项会根据Go包基础架构的需要自动添加。
 
 根据包的需求，可以选择性地定义一些特定于Go基础架构的额外变量。它们中的许多只在非常特定的情况下有用，因此典型的包将只使用其中的一些，或完全不使用。
 
-*   包必须在`FOO_GOMOD`变量中指定它的Go模块名称。如果没有指定，它默认为`URL-domain/1st-part-of-URL/2nd-part-of-URL`，例如对于指定`FOO_SITE = $(call github,bar,foo,$(FOO_VERSION))`的包，`FOO_GOMOD`的值为`github.com/bar/foo`。如果`go.mod`文件不存在，Go包基础设施将自动在包源树中生成一个最小的`go.mod`文件。
+*   包必须在`FOO_GOMOD`变量中指定它的Go模块名称。如果没有指定，它默认为`URL-domain/1st-part-of-URL/2nd-part-of-URL`，例如对于指定`FOO_SITE = $(call github,bar,foo,$(FOO_VERSION))`的包，`FOO_GOMOD`的值为`github.com/bar/foo`。如果`go.mod`文件不存在，Go包基础架构将自动在包源树中生成一个最小的`go.mod`文件。
 *   `FOO_LDFLAGS`和`FOO_TAGS`可以分别用于将`LDFLAGS`或`TAGS`传递给`go`构建命令。
 *   `FOO_BUILD_TARGETS`可以用来传递要构建的目标列表。如果未指定`FOO_BUILD_TARGETS`，则默认为`.`。我们有两种情况:
     
@@ -4160,7 +4160,7 @@ QMake包基础架构的主要宏是`qmake-package`。它类似于`generic-packag
 ## 18.20. Infrastructure for packages building kernel modules
 ----------------------------------------------------------
 
-Buildroot提供了一个辅助基础架构，使编写构建和安装Linux内核模块的包变得容易。有些包只包含一个内核模块，其他包除了内核模块之外还包含程序和库。Buildroot的helper基础设施支持这两种情况。
+Buildroot提供了一个辅助基础架构，使编写构建和安装Linux内核模块的包变得容易。有些包只包含一个内核模块，其他包除了内核模块之外还包含程序和库。Buildroot的helper基础架构支持这两种情况。
 
 ### 18.20.1. `kernel-module` tutorial
 
@@ -4185,13 +4185,13 @@ Buildroot提供了一个辅助基础架构，使编写构建和安装Linux内核
 
 第7-11行定义了常用的元数据，用于指定版本、存档名称、在何处查找包源的远程URI、许可信息。
 
-在第13行，我们调用`kernel-module`辅助基础设施，它生成所有适当的Makefile规则和变量来构建该内核模块。
+在第13行，我们调用`kernel-module`辅助基础架构，它生成所有适当的Makefile规则和变量来构建该内核模块。
 
 最后，在第14行，我们调用了[`generic-package`基础架构](#1861-generic-package-tutorial)。
 
 `linux`依赖项会自动添加，因此不需要在`FOO_DEPENDENCIES`中指定它。
 
-您可能已经注意到，与其他包基础结构不同，我们显式调用第二个基础结构。这使得一个包可以构建一个内核模块，如果需要，还可以使用任何其他包基础结构来构建普通的用户层组件(库、可执行文件……)。仅使用`kernel-module`基础架构是不够的;**必须**使用另一个包基础设施。
+您可能已经注意到，与其他包基础结构不同，我们显式调用第二个基础结构。这使得一个包可以构建一个内核模块，如果需要，还可以使用任何其他包基础结构来构建普通的用户层组件(库、可执行文件……)。仅使用`kernel-module`基础架构是不够的;**必须**使用另一个包基础架构。
 
 让我们看一个更复杂的例子:
 
@@ -4268,7 +4268,7 @@ $(eval $(generic-package))
 *   epub
 *   text
 
-尽管Buildroot只包含一个用AsciiDoc编写的文档，但就像包一样，有一个使用AsciiDoc语法渲染文档的基础设施。
+尽管Buildroot只包含一个用AsciiDoc编写的文档，但就像包一样，有一个使用AsciiDoc语法渲染文档的基础架构。
 
 同样对于包，AsciiDoc的基础架构可以从[br2-external树](#92-keeping-customizations-outside-of-buildroot)中获取。这允许br2-external树的文档与Buildroot文档匹配，因为它将呈现相同的格式，使用相同的布局和主题。
 
@@ -4361,7 +4361,7 @@ Linux内核包可以使用一些基于包钩子的特定基础结构来构建Lin
 
 ### 18.22.1. linux-kernel-tools
 
-Buildroot提供了一个辅助基础设施，用于为Linux内核源代码中的目标构建一些用户空间工具。由于它们的源代码是内核源代码的一部分，因此存在一个特殊的包，`linux-tools`，并重用在目标上运行的Linux内核源代码。
+Buildroot提供了一个辅助基础架构，用于为Linux内核源代码中的目标构建一些用户空间工具。由于它们的源代码是内核源代码的一部分，因此存在一个特殊的包，`linux-tools`，并重用在目标上运行的Linux内核源代码。
 
 让我们看一个Linux工具的例子。对于名为`foo`的新Linux工具，在现有的`package/linux-tools/Config.in`中创建一个新的菜单项。该文件将包含与将使用并显示在配置工具中的每个内核工具相关的选项描述。它基本上看起来像这样:
 
@@ -4419,7 +4419,7 @@ Makefile的其余部分，第11-25行定义了在Linux工具构建过程的不�
 
 ### 18.22.2. linux-kernel-extensions
 
-有些包提供了需要修改Linux内核树的新特性。这可以是以补丁的形式应用到内核树，也可以是以向内核树添加新文件的形式。Buildroot的Linux内核扩展基础设施提供了一个简单的解决方案，可以在提取内核源代码之后、应用内核补丁之前自动完成这项工作。使用这种机制打包的扩展示例包括实时扩展Xenomai和RTAI，以及一组out-of-tree LCD屏幕驱动程序`fbtft`。
+有些包提供了需要修改Linux内核树的新特性。这可以是以补丁的形式应用到内核树，也可以是以向内核树添加新文件的形式。Buildroot的Linux内核扩展基础架构提供了一个简单的解决方案，可以在提取内核源代码之后、应用内核补丁之前自动完成这项工作。使用这种机制打包的扩展示例包括实时扩展Xenomai和RTAI，以及一组树外 LCD屏幕驱动程序`fbtft`。
 
 让我们看一个如何添加新的Linux扩展`foo`的例子。
 
@@ -4525,7 +4525,7 @@ glibc C库集成了一个完整的gettext实现，支持翻译。因此，glibc�
 因此，为了确保正确处理本地语言支持，Buildroot中可以使用NLS支持的包应该:
 
 1.  当`BR2_SYSTEM_ENABLE_NLS=y`时，确保启用了NLS支持。对于autotools包，这是自动完成的，因此应该只对使用其他包基础架构的包进行此操作。
-2.  将`$(TARGET_NLS_DEPENDENCIES)`添加到`<pkg>_DEPENDENCIES`包变量中。这种添加应该无条件地完成:该变量的值由核心基础设施自动调整，以包含相关的包列表。如果禁用了NLS支持，则此变量为空。如果启用了NLS支持，此变量包含`host-gettext`，以便在主机上可以使用编译翻译文件所需的工具。此外，如果使用uClibc或musl，该变量还包含`gettext`，以便获得完整的gettext实现。
+2.  将`$(TARGET_NLS_DEPENDENCIES)`添加到`<pkg>_DEPENDENCIES`包变量中。这种添加应该无条件地完成:该变量的值由核心基础架构自动调整，以包含相关的包列表。如果禁用了NLS支持，则此变量为空。如果启用了NLS支持，此变量包含`host-gettext`，以便在主机上可以使用编译翻译文件所需的工具。此外，如果使用uClibc或musl，该变量还包含`gettext`，以便获得完整的gettext实现。
 3.  如果需要，将`$(TARGET_NLS_LIBS)`添加到链接标志中，以便使用`libintl`链接包。autotools包通常不需要这样做，因为它们通常会自动检测它们应该与`libintl`链接。然而，使用其他构建系统的包，或者有问题的基于autotools的包可能需要这个。`$(TARGET_NLS_LIBS)`应该无条件地添加到链接器标志中，因为核心会根据配置自动将其设置为空或定义为`-lintl`。
 
 不应该对`Config.in`文件进行任何更改以支持NLS。
@@ -5242,7 +5242,7 @@ OK
 创建一个基本的测试用例包括:
 
 *   定义一个继承`infra.basetest.BRTest`的测试类
-*   定义测试类的`config`成员，到Buildroot配置中为这个测试用例构建。它可以选择依赖运行时测试基础设施提供的配置片段:`infra.basetest.BASIC_TOOLCHAIN_CONFIG`来获得基本的架构/工具链配置，`infra.basetest.MINIMAL_CONFIG`来不构建任何文件系统。使用`infra.basetest.BASIC_TOOLCHAIN_CONFIG`的优点是提供了匹配的Linux内核映像，它允许在Qemu中引导生成的映像，而无需将构建Linux内核映像作为测试用例的一部分，因此显著减少了测试用例所需的构建时间。
+*   定义测试类的`config`成员，到Buildroot配置中为这个测试用例构建。它可以选择依赖运行时测试基础架构提供的配置片段:`infra.basetest.BASIC_TOOLCHAIN_CONFIG`来获得基本的架构/工具链配置，`infra.basetest.MINIMAL_CONFIG`来不构建任何文件系统。使用`infra.basetest.BASIC_TOOLCHAIN_CONFIG`的优点是提供了匹配的Linux内核映像，它允许在Qemu中引导生成的映像，而无需将构建Linux内核映像作为测试用例的一部分，因此显著减少了测试用例所需的构建时间。
 *   实现一个`def test_run(self):`函数来实现在构建完成后运行的实际测试。它们可能是通过使用`run_cmd_on_host()`辅助函数在主机上运行命令来验证构建输出的测试。或者他们可以使用在测试用例中可用的`Emulator`对象`self.emulator`来引导Qemu中生成的系统。例如，`self.emulator.boot()`允许在Qemu中启动系统，`self.emulator.login()`允许登录，`self.emulator.run()`允许在Qemu中运行shell命令。
 
 在创建测试脚本之后，将自己添加到`DEVELOPERS`文件中，成为测试用例的维护者。
@@ -5270,7 +5270,7 @@ TestInitSystemBusyboxRw-run.log
 
 ### 22.7.3. Runtime tests and Gitlab CI
 
-所有运行时测试都由Buildroot Gitlab CI基础设施定期执行，请参阅.gitlab.yml和[https://gitlab.com/buildroot.org/buildroot/-/jobs](https://gitlab.com/buildroot.org/buildroot/-/jobs)。
+所有运行时测试都由Buildroot Gitlab CI基础架构定期执行，请参阅.gitlab.yml和[https://gitlab.com/buildroot.org/buildroot/-/jobs](https://gitlab.com/buildroot.org/buildroot/-/jobs)。
 
 您还可以使用Gitlab CI来测试新的测试用例，或者验证在Buildroot中进行更改后现有测试是否继续工作。
 
@@ -5315,7 +5315,7 @@ $ git push gitlab HEAD:foo-tests.init
 主Buildroot目录包含一个名为`DEVELOPERS`的文件，该文件列出了涉及Buildroot各个领域的开发人员。多亏了这个文件，`get-developers`工具允许:
 
 *   通过解析补丁并将修改后的文件与相关开发人员进行匹配，计算出需要发送补丁的开发人员列表。详情请参阅[第22.5节，“提交补丁”](#225-submitting-patches)。
-*   找出负责给定架构或包的开发人员，以便在此架构或包上发生构建失败时通知他们。这是通过与Buildroot的自动构建基础设施交互完成的。
+*   找出负责给定架构或包的开发人员，以便在此架构或包上发生构建失败时通知他们。这是通过与Buildroot的自动构建基础架构交互完成的。
 
 我们要求在Buildroot中添加新包、新板或新功能的开发人员在` DEVELOPERS`文件中注册自己。例如，我们希望开发人员贡献一个新包，在他的补丁中包含对`DEVELOPERS`文件的适当修改。
 
