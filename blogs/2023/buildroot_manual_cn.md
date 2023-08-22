@@ -1524,7 +1524,7 @@ include $(sort $(wildcard $(BR2_EXTERNAL_BAR_42_PATH)/package/*/*.mk))
 
 #### `provides/`目录
 
-对于某些包，Buildroot提供了两个(或更多)api兼容的此类包的实现。例如，可以选择libjpeg或jpeg-turbo;openssl和libressl之间有一个。有一个选择一个已知的，预先配置的工具链…
+对于某些包，Buildroot提供了在 API 兼容的此类包的两个（或多个）实现之间进行选择。例如，可以选择 libjpeg 或 jpeg-turbo；openssl 和 libressl 之间有一个；可以选择已知的预配置工具链之一……
 
 br2-external可以通过提供一组定义这些选项的文件来扩展这些选项:
 
@@ -1712,7 +1712,7 @@ External options  --->
     (0x10AD) my-board flash address
 ```
 
-如果你使用了多个br2-external树，它看起来会是这样的(扩展布局，第二棵名为`FOO_27`，但在`external.desc`中没有`desc:`字段):
+如果您使用不止一棵 br2-external 树，它看起来像（布局展开，第二棵名为`FOO_27`，但`external.desc`中没有`desc:`字段）：
 
 ```bash
 External options  --->
@@ -1796,17 +1796,17 @@ Buildroot提供了一些辅助目标，使配置文件的保存更容易。
 
 根文件系统覆盖(`BR2_ROOTFS_OVERLAY`)
 
-文件系统覆盖层(filesystem overlay)是一棵文件树，在目标文件系统构建后直接复制到目标文件系统上。要启用此功能，请将配置选项`BR2_ROOTFS_OVERLAY`(在`System configuration`菜单中)设置为覆盖层的根。你甚至可以指定多个叠加层，以空格分隔。如果你指定了一个相对路径，它将是相对于Buildroot树的根的。版本控制系统的隐藏目录，如`.git`、`.svn`, `.hg`等，文件名为`.hg`。`.empty`和以`~`结尾的文件将被排除在副本之外。
+文件系统覆盖层(filesystem overlay)是一个文件树，在目标文件系统构建后直接复制到目标文件系统上。要启用此功能，请将配置选项`BR2_ROOTFS_OVERLAY`(在`System configuration`菜单中)设置为覆盖的根目录。你甚至可以指定多个叠加层，以空格分隔。如果你指定了一个相对路径，它将是相对于Buildroot树的根。版本控制系统的隐藏目录，如`.git`、`.svn`、`.hg`等名为`.empty`的文件和以`~`结尾的文件不会被复制。
 
 当启用`BR2_ROOTFS_MERGED_USR`时，覆盖网不能包含/bin、/lib或/sbin目录，因为Buildroot会将它们创建为指向/usr中相关文件夹的符号链接。在这种情况下，如果覆盖层上有任何程序或库，它们应该放在/usr/bin、/usr/sbin和/usr/lib中
 
 如[第9.1节，“推荐的目录结构”](#91-recommended-directory-structure)所示，这个覆盖层的推荐路径是`board/<company>/<boardname>/rootfs-overlay`。
 
-构建后脚本(`BR2_ROOTFS_POST_BUILD_SCRIPT`)
+Post-build脚本(`BR2_ROOTFS_POST_BUILD_SCRIPT`)
 
-Post-build脚本是在Buildroot构建所有选定软件之后，但在组装rootfs映像之前调用的shell脚本。要启用此功能，请在配置选项`BR2_ROOTFS_POST_BUILD_SCRIPT`(在`System configuration`菜单中)中指定空格分隔的后构建脚本列表。如果你指定了一个相对路径，它将是相对于Buildroot树的根的。
+Post-build脚本是在Buildroot构建所有选定软件之后，但在组装rootfs映像之前调用的shell脚本。要启用此功能，请在配置选项`BR2_ROOTFS_POST_BUILD_SCRIPT`(在`System configuration`菜单中)中指定以空格分隔的post-build脚本列表。如果你指定了一个相对路径，它将是相对于Buildroot树的根。
 
-使用post-build脚本，你可以删除或修改目标文件系统中的任何文件。然而，您应该谨慎使用此功能。当你发现某个包生成了错误或不需要的文件时，你应该修复该包，而不是使用一些构建后清理脚本来绕过它。
+使用post-build脚本，你可以删除或修改目标文件系统中的任何文件。然而，您应该谨慎使用此功能。每当你发现某个包生成了错误或不需要的文件时，你应该修复该包，而不是使用一些post-build清理脚本来解决它。
 
 如[第9.1节，“推荐的目录结构”](#91-recommended-directory-structure)所示，这个脚本的推荐路径是`board/<company>/<boardname>/post_build.sh`。
 
@@ -1833,9 +1833,9 @@ Post-build脚本是在Buildroot构建所有选定软件之后，但在组装root
 
 根文件系统映像是根据目标框架创建的，所有包都会在其上安装它们的文件。在构建和安装任何包之前，框架被复制到目标目录`output/target`。默认的目标框架提供了标准的Unix文件系统布局以及一些基本的init脚本和配置文件。
 
-如果默认的框架(在`system/skeleton`下提供)不符合你的需求，你通常会使用根文件系统覆盖层或构建后脚本来适应它。然而，如果默认的骨架与您所需要的完全不同，那么使用自定义的骨架可能更合适。
+如果默认的骨架(在`system/skeleton`下提供)不符合你的需求，你通常会使用根文件系统覆盖或post-build脚本来适应它。然而，如果默认的骨架与您所需要的完全不同，那么使用自定义的骨架可能更合适。
 
-要启用此功能，请启用配置选项`BR2_ROOTFS_SKELETON_CUSTOM`，并将`BR2_ROOTFS_SKELETON_CUSTOM_PATH`设置为自定义骨架的路径。这两个选项都可以在`System configuration`菜单中使用。如果你指定了一个相对路径，它将是相对于Buildroot树的根的。
+要启用此功能，请启用配置选项`BR2_ROOTFS_SKELETON_CUSTOM`，并将`BR2_ROOTFS_SKELETON_CUSTOM_PATH`设置为自定义骨架的路径。这两个选项都可以在`System configuration`菜单中找到。如果你指定了一个相对路径，它将是相对于Buildroot树的根。
 
 自定义的框架不需要包含/bin、/lib或/sbin目录，因为它们是在构建过程中自动创建的。当启用了`BR2_ROOTFS_MERGED_USR`时，自定义框架不能包含/bin、/lib或/sbin目录，因为Buildroot会将它们创建为指向/usr中相关文件夹的符号链接。在这种情况下，如果框架中有任何程序或库，它们应该放置在/usr/bin、/usr/sbin和/usr/lib中
 
@@ -1885,9 +1885,9 @@ Post-fakeroot脚本在需要调整文件系统以进行通常只有root用户才
 
 例如，Post-image脚本可以用于在NFS服务器导出的位置自动提取根文件系统的压缩包，或者创建一个捆绑根文件系统和内核映像的特殊固件映像，或者用于项目所需的任何其他自定义操作。
 
-要启用此功能，请在配置选项`BR2_ROOTFS_POST_IMAGE_SCRIPT`(在`System configuration`菜单中)中指定空格分隔的后视图脚本列表。如果你指定了一个相对路径，它将是相对于Buildroot树的根的。
+要启用此功能，请在配置选项`BR2_ROOTFS_POST_IMAGE_SCRIPT`(在`System configuration`菜单中)中指定空格分隔的post-image脚本列表。如果你指定了一个相对路径，它将是相对于Buildroot树的根。
 
-就像后期构建脚本一样，后期图像脚本也以主Buildroot树作为当前工作目录运行。`images`输出目录的路径作为每个脚本的第一个参数传递。如果配置选项`BR2_ROOTFS_POST_SCRIPT_ARGS`不为空，这些参数也会传递给脚本。所有脚本都将被传递完全相同的参数集，不可能给每个脚本传递不同的参数集。
+就像post-build脚本一样，post-image脚本也以主Buildroot树作为当前工作目录运行。`images`输出目录的路径作为第一个参数传递给每个脚本。如果配置选项`BR2_ROOTFS_POST_SCRIPT_ARGS`不为空，这些参数也会传递给脚本。所有脚本都将被传递完全相同的参数集，不可能给每个脚本传递不同的参数集。
 
 同样，就像构建后的脚本一样，这些脚本可以访问环境变量`BR2_CONFIG`, `HOST_DIR`, `STAGING_DIR`, `TARGET_DIR`, `BUILD_DIR`, `BINARIES_DIR`, `CONFIG_DIR` 和 `BASE_DIR`。
 
@@ -2360,33 +2360,33 @@ config BR2_PACKAGE_LIBFOO
 #
 ################################################################################
 ```
-    
+
 *   赋值:使用`=`前后加一个空格:
-    
+
 ```bash
 LIBFOO_VERSION = 1.0
 LIBFOO_CONF_OPTS += --without-python-support
 ```
-    
-    不要对齐`=`符号。
-    
+
+不要对齐`=`符号。
+
 *   缩进:只使用tab:
-    
+
 ```bash
 define LIBFOO_REMOVE_DOC
         $(RM) -r $(TARGET_DIR)/usr/share/libfoo/doc \
                 $(TARGET_DIR)/usr/share/man/man3/libfoo*
 endef
 ```
-    
+
     请注意，`define`块中的命令总是以tab开头，因此make将它们识别为命令。
     
 *   可选依赖:
     
     *   更喜欢多行语法。
-        
-        YES:
-        
+
+YES:
+
 ```bash
 ifeq ($(BR2_PACKAGE_PYTHON3),y)
 LIBFOO_CONF_OPTS += --with-python-support
@@ -2395,20 +2395,20 @@ else
 LIBFOO_CONF_OPTS += --without-python-support
 endif
 ```
-        
-        NO:
-        
+
+NO:
+
 ```bash
 LIBFOO_CONF_OPTS += --with$(if $(BR2_PACKAGE_PYTHON3),,out)-python-support
 LIBFOO_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON3),python3,)
 ```
-        
+
     *   保持配置选项和依赖项接近。
     
 *   可选钩子:将钩子定义和赋值放在一个if块中。
-    
-    YES:
-    
+
+YES:
+
 ```bash
 ifneq ($(BR2_LIBFOO_INSTALL_DATA),y)
 define LIBFOO_REMOVE_DATA
@@ -2417,9 +2417,9 @@ endef
 LIBFOO_POST_INSTALL_TARGET_HOOKS += LIBFOO_REMOVE_DATA
 endif
 ```
-    
-    NO:
-    
+
+NO:
+
 ```bash
 define LIBFOO_REMOVE_DATA
         $(RM) -r $(TARGET_DIR)/usr/share/libfoo/data
@@ -2429,7 +2429,7 @@ ifneq ($(BR2_LIBFOO_INSTALL_DATA),y)
 LIBFOO_POST_INSTALL_TARGET_HOOKS += LIBFOO_REMOVE_DATA
 endif
 ```
-    
+
 
 ## 16.3. The `genimage.cfg` file
 -----------------------------
@@ -2475,9 +2475,9 @@ image sdimage.img {
 *   每一个`option`(即: `image`， `offset`， `size`)必须具有`=`赋值的值，并且与指定的值相距一个空格。
 *   文件名必须至少以genimage前缀开始，并具有.cfg扩展名以便识别。
 *   允许的`offset`和`size`选项符号是:`G`， `M`， `K`(不是`k`)。如果上面的表示法无法表示精确的字节计数，那么请使用十六进制的`0x`前缀，或者作为最后的机会，使用字节计数。在注释中使用`GB`， `MB`， `KB`(不是`Kb`)来代替`G`， `M`， `K`。
-*   对于GPT分区，对于EFI系统分区，`partition-type-uuid`值必须是`U`(通过genimage扩展为`c12a7328-f81f-11d2-ba4b-00a0c93ec93b`)，对于FAT分区(通过genimage扩展为`ebd0a0a2-b9e5-4433-87c0-68b6b72699c7`)，或者对于根文件系统或其他文件系统(通过genimage扩展为`0fc63daf-8483-4772-8e79-3d69d8477de4`)。尽管`L`是genimage的默认值，但我们更希望在`genimage.cfg`文件中明确指定它。最后，使用这些快捷方式时不要使用双引号，例如`partition-type-uuid = U`。如果明确指定了GUID，则应该使用小写字母。
+*   对于 GPT 分区，EFI 系统分区的`partition-type-uuid`值必须是`U`(通过genimage扩展为`c12a7328-f81f-11d2-ba4b-00a0c93ec93b`)，FAT 分区的`F` (通过genimage扩展为`ebd0a0a2-b9e5-4433-87c0-68b6b72699c7`)，或者对于根文件系统或其他文件系统的`L`(通过genimage扩展为`0fc63daf-8483-4772-8e79-3d69d8477de4`)。尽管`L`是genimage的默认值，但我们更希望在`genimage.cfg`文件中明确指定它。最后，使用这些快捷方式时不要使用双引号，例如`partition-type-uuid = U`。如果明确指定了GUID，则应该使用小写字母。
 
-`genimage.cfg`文件是Buildroot中用于生成最终图像文件的genimage工具的输入。sdcard.img)。有关genimage语言的更多详细信息，请参阅[https://github.com/pengutronix/genimage/blob/master/README.rst](https://github.com/pengutronix/genimage/blob/master/README.rst)。
+`genimage.cfg`文件是 Buildroot 中使用的 genimage 工具的输入，用于生成最终映像文件（即 sdcard.img）。有关genimage语言的更多详细信息，请参阅[https://github.com/pengutronix/genimage/blob/master/README.rst](https://github.com/pengutronix/genimage/blob/master/README.rst)。
 
 ## 16.4. The documentation
 -----------------------
@@ -4799,7 +4799,7 @@ AC_PROG_MAKE_SET
 ## 19.4. Additional patch documentation
 ------------------------------------
 
-理想情况下，所有补丁都应该通过`Upstream`预告片记录上游补丁或补丁提交(适用时)。
+理想情况下，所有补丁都应通过“上游”预告片记录上游补丁或补丁提交（如果适用）。
 
 在向主线移植已经被接受的upstream补丁时，最好引用提交的URL:
 
@@ -4839,7 +4839,7 @@ TODO
 
 在构建包时，可以检测`Buildroot`的步骤。定义变量`BR2_INSTRUMENTATION_SCRIPTS`，在空格分隔的列表中包含一个或多个脚本(或其他可执行文件)的路径，你想在每个步骤之前和之后调用它。这些脚本按顺序调用，有三个参数:
 
-*   `start`或`end`表示一个步骤的开始(代表结束);
+*   `start` 或 `end` 表示步骤的开始（或结束）；
 *   即将开始或刚刚结束的步骤的名称;
 *   包的名称。
 
@@ -4855,9 +4855,9 @@ make BR2_INSTRUMENTATION_SCRIPTS="/path/to/my/script1 /path/to/my/script2"
 *   `patch`
 *   `configure`
 *   `build`
-*   `install-host`, 当主机包安装在`$(HOST_DIR)`中
-*   `install-target`, 当目标包安装在`$(TARGET_DIR)`中
-*   `install-staging`, 当目标包安装在`$(STAGING_DIR)`中
+*   `install-host`, 当主机包安装在`$(HOST_DIR)`中时
+*   `install-target`, 当目标包安装在`$(TARGET_DIR)`中时
+*   `install-staging`, 当目标包安装在`$(STAGING_DIR)`中时
 *   `install-image`, 当目标包在`$(BINARIES_DIR)`中安装文件时
 
 该脚本可以访问以下变量:
