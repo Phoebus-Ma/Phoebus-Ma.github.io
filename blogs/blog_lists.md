@@ -6,6 +6,7 @@
 - [C program manual](2022/c_manual.md)
 - [C++ program manual](2022/cpp_manual/cpp_manual.md)
 - [C# program manual](2022/cs_manual/cs_manual.md)
+- [Python program manual](2022/python_manual/python_manual.md)
 
 **2023**
 
