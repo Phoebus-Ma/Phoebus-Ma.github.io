@@ -18,3 +18,4 @@
 - [Linux frome scratch 11.3](2023/linux_from_scratch/lfs_113/lfs_manual.md)
 - [Beyond linux from scratch 11.3](2023/linux_from_scratch/blfs_systemd_113/blfs_systemd_manual.md)
 - [Beyond linux from scratch 11.3 (CN)](2023/linux_from_scratch/blfs_systemd_113_cn/blfs_systemd_manual.md)
+- [Qemu serials](2023/qemu/qemu_list.md)
