@@ -19,5 +19,6 @@
 - [Beyond linux from scratch 11.3](2023/linux_from_scratch/blfs_systemd_113/blfs_systemd_manual.md)
 - [Beyond linux from scratch 11.3 (CN)](2023/linux_from_scratch/blfs_systemd_113_cn/blfs_systemd_manual.md)
 - [BLFS Using xfce desktop](2023/linux_from_scratch/blfs-xfce-desktop-step.md)
-- [Qemu serials](2023/qemu/qemu_list.md)
 - [ACPI Table](2023/acpi_table_cn.md)
+- [Qemu serials](2023/qemu/qemu_list.md)
+- [U-boot serials](2023/uboot/uboot_list.md)
