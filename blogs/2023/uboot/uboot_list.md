@@ -8,5 +8,5 @@
 - [u-boot 驱动开发]()
 - [u-boot debug]()
 - [u-boot 新增开发板]()
-- [u-boot sandbox]()
+- [u-boot sandbox](uboot_sandbox.md)
 - [u-boot 内存支持和频率修改]()
