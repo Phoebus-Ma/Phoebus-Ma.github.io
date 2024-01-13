@@ -1,6 +1,7 @@
 
 # U-boot list
 
+- [u-boot 目录介绍](uboot_tables.md)
 - [u-boot 启动流程](uboot_booting.md)
 - [u-boot 代码流程](uboot_code_flow.md)
 - [u-boot 代码流程2](uboot_code_flow2.md)
