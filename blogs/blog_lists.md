@@ -22,4 +22,5 @@
 - [ACPI Table](2023/acpi_table_cn.md)
 - [Qemu serials](2023/qemu/qemu_list.md)
 - [U-boot serials](2023/uboot/uboot_list.md)
+- [U-boot driver serials](2023/uboot_drivers/uboot_driver_list.md)
 - [ARM serials](2023/arm/arm_list.md)
