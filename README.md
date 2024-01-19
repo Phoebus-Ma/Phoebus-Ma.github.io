@@ -4,4 +4,4 @@
 - [About](about.md)
 
 
-**Copyright © 2023 Phoebus**
+**Copyright © 2024 Phoebus**
