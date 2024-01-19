@@ -7,7 +7,7 @@
 [4. 以太网驱动程序指南](uboot_driver_ethernet.md)
 [5. 预重定位设备树操作](uboot_relocation_dt.md)
 [6. 文件系统固件加载器](uboot_fs_loader.md)
-[7. 如何将 I2C 驱动程序移植到驱动程序模型](uboot_i2c_to_dm.md)
+[7. 如何将 I2C 驱动程序移植到驱动程序模型](uboot_driver_i2c.md)
 [8. Live 设备树](uboot_live_dt.md)
 [9. 迁移时间表](uboot_migration_schedule.md)
 [10. NVMe 支持](uboot_driver_nvme.md)
