@@ -28,4 +28,5 @@
 - [U-boot serials](2024/uboot/uboot_list.md)
 - [U-boot driver serials](2024/uboot_drivers/uboot_driver_list.md)
 - [Linux driver serials](2024/linux_drivers/linux_driver_list.md)
+- [Desktop serials](2024/desktop/desktop_list.md)
 
