@@ -11,3 +11,15 @@
 - [u-boot 新增开发板]()
 - [u-boot sandbox](uboot_sandbox.md)
 - [u-boot 内存支持和频率修改]()
+
+
+**Qemu**
+
+- [ACPI on QEMU](uboot_emu_qemu_acpi.md)
+- [Emulation of block devices](uboot_emu_block.md)
+- [Semihosting](uboot_emu_semihosting.md)
+- [QEMU ARM](uboot_emu_qemu_arm.md)
+- [QEMU MIPS](uboot_emu_qemu_mips.md)
+- [QEMU PPC E500](uboot_emu_qemu_ppc.md)
+- [QEMU RISC-V](uboot_emu_qemu_riscv.md)
+- [QEMU x86](uboot_emu_qemu_x86.md)
