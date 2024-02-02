@@ -14,7 +14,7 @@
 - [Kyber I/O 调度程序可调参数](doc_blk_kyber_io.md)
 - [空块设备驱动程序](doc_blk_null_blk.md)
 - [对持久预留的块层支持](doc_blk_persistent.md)
-- [/sys/block/<dev>/stat 中的块层统计信息](doc_blk_layer_statistics.md)
+- [stat 中的块层统计信息](doc_blk_layer_statistics.md)
 - [切换调度程序](doc_blk_switching_scheduler.md)
 - [显式易失性回写缓存控制](doc_blk_write_back.md)
 - [用户空间块设备驱动程序（ublk驱动程序）](doc_blk_ublk.md)
