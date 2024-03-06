@@ -3,15 +3,26 @@
 
 - [u-boot 目录介绍](uboot_tables.md)
 - [u-boot 启动流程](uboot_booting.md)
+- [u-boot 标准启动](uboot_standard_boot.md)
 - [u-boot 代码流程](uboot_code_flow.md)
 - [u-boot 代码流程2](uboot_code_flow2.md)
-- [u-boot 新增命令行]()
-- [u-boot 驱动开发]()
-- [u-boot debug]()
-- [u-boot 新增开发板]()
+- [u-boot 新增命令行](uboot_command.md)
+- [u-boot debug](uboot_debug.md)
+- [u-boot 设备树](uboot_device_tree.md)
+- [u-boot 通用配置](uboot_generic_config.md)
+- [u-boot 全局数据](uboot_global_data.md)
+- [u-boot 日志](uboot_logging.md)
+- [u-boot SPL框架](uboot_spl_framework.md)
+- [u-boot 测试](uboot_tests.md)
 - [u-boot sandbox](uboot_sandbox.md)
-- [u-boot 内存支持和频率修改]()
 
+**Board**
+
+- [AllWinner Board](uboot_board_allwinner.md)
+- [Amlogic Board](uboot_board_amlogic.md)
+- [NXP Board](uboot_board_nxp.md)
+- [Rockchip Board](uboot_board_rockchip.md)
+- [Samsung Board](uboot_board_samsung.md)
 
 **Qemu**
 
