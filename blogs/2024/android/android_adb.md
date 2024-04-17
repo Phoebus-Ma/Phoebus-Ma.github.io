@@ -71,17 +71,17 @@ Android 11（API 级别 30）及更高版本支持使用 Android 调试桥 (adb)
 
 系统会弹出 Pair devices over Wi-Fi 窗口。
 
-![ADB wifi QR code](adb_wifi-qr_code_scan.png)
+![ADB wifi QR code](res/adb_wifi-qr_code_scan.png)
 
 3. 在您的设备上，点按无线调试，然后配对您的设备：
 
-![ADB wifi debugging](adb_wifi-wireless_debugging.png)
+![ADB wifi debugging](res/adb_wifi-wireless_debugging.png)
 
 a. 如需使用二维码配对设备，请选择使用二维码配对设备，然后扫描 Pair devices over Wi-Fi 弹出式窗口中提供的二维码（如图 2 所示）。
 
 b. 如需使用配对码配对设备，请从 Pair devices over Wi-Fi 弹出式窗口中选择 Pair device with pairing code。在您的设备上，选择使用配对码配对设备，并记下提供的 6 位数配对码。设备显示在 Pair devices over Wi-Fi 窗口中后，您可以选择 Pair，并输入设备上显示的 6 位数配对码。
 
-![ADB wifi pin code](adb_wifi-pin_code_entry.png)
+![ADB wifi pin code](res/adb_wifi-pin_code_entry.png)
 
 4. 配对设备后，您可以尝试将应用部署到该设备。
 
@@ -89,7 +89,7 @@ b. 如需使用配对码配对设备，请从 Pair devices over Wi-Fi 弹出式�
 
 5. 如果您想快速开启和关闭无线调试功能，可以利用快捷设置开发者图块进行无线调试（可在开发者选项 > 快捷设置开发者图块中找到）。
 
-![ADB wifi quick settings](adb_wifi-quick_settings.png)
+![ADB wifi quick settings](res/adb_wifi-quick_settings.png)
 
 
 ## 3.2 使用命令行连接 Wi-Fi
@@ -108,7 +108,7 @@ b. 如需使用配对码配对设备，请从 Pair devices over Wi-Fi 弹出式�
 
 6. 收到提示时，输入配对码，如下所示。
 
-![ADB wifi cmd](adb_wifi-cmd_line_pairing.png)
+![ADB wifi cmd](res/adb_wifi-cmd_line_pairing.png)
 
 
 ## 3.3 解决无线连接问题
