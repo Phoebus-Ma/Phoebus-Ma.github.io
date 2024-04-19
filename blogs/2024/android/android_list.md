@@ -12,3 +12,4 @@
 - [Android Application Signing](android_apk_signing.md)
 - [Android Encryption](android_encryption.md)
 - [Android SELinux](android_selinux.md)
+- [Android Verified Boot](android_verified_boot.md)
