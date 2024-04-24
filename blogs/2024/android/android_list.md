@@ -3,6 +3,7 @@
 
 - [Android API Version](android_api_version.md)
 - [Android Build Source Code](android_build.md)
+- [Android Build for tsinghua mirror](android_aosp_for_tsinghua.md)
 - [Android OTA for AllWinner H3](android_ota_for_h3.md)
 - [Android Bootloader](android_bootloader.md)
 - [Android Debug Bridge](android_adb.md)
