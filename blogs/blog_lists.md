@@ -8,6 +8,7 @@
 - [C# program manual](2022/cs_manual/cs_manual.md)
 - [Python program manual](2022/python_manual/python_manual.md)
 
+
 **2023**
 
 - [Buildroot manual](2023/buildroot_manual_cn.md)
@@ -20,7 +21,9 @@
 - [Beyond linux from scratch 11.3 (CN)](2023/linux_from_scratch/blfs_systemd_113_cn/blfs_systemd_manual.md)
 - [BLFS Using xfce desktop](2023/linux_from_scratch/blfs-xfce-desktop-step.md)
 - [ACPI Table](2023/acpi_table_cn.md)
+- [Build script serials](2023/build/build_list.md)
 - [Qemu serials](2023/qemu/qemu_list.md)
+
 
 **2024**
 
