@@ -34,4 +34,5 @@
 - [Desktop serials](2024/desktop/desktop_list.md)
 - [AI serials](2024/ai/ai_list.md)
 - [Android serials](2024/android/android_list.md)
+- [Build VirtualBox](2024/others/virtualbox_build.md)
 
