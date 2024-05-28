@@ -16,6 +16,14 @@
 - [u-boot 测试](uboot_tests.md)
 - [u-boot sandbox](uboot_sandbox.md)
 
+
+**新增开发板**
+
+- [u-boot 新增ST开发板](uboot_add_stm32_board.md)
+- [u-boot 新增TI开发板](uboot_add_ti_board.md)
+- [u-boot 新增NXP开发板]（uboot_add_nxp_board.md）
+
+
 **Board**
 
 - [AllWinner Board](uboot_board_allwinner.md)
@@ -23,6 +31,7 @@
 - [NXP Board](uboot_board_nxp.md)
 - [Rockchip Board](uboot_board_rockchip.md)
 - [Samsung Board](uboot_board_samsung.md)
+
 
 **Qemu**
 
