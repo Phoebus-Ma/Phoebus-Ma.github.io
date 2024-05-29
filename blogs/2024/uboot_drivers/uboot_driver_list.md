@@ -21,5 +21,5 @@
 - [18. 如何将 SPI 驱动程序移植到驱动程序模型](uboot_driver_spi.md)
 - [19. USB 如何与驱动程序模型配合使用](uboot_driver_usb.md)
 - [20. VirtIO 支持](uboot_driver_virt_io.md)
-- [21. DRAM 支持](uboot_driver_dram.md)
+- [21. Rockchip DRAM 支持](uboot_driver_dram_rockchip.md)
 
